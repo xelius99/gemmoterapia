@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Gemmoterapia Clinica - 56 Gemmoderivati</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 { font-size: 24px; margin-bottom: 5px; }
+        .subtitle { font-size: 12px; opacity: 0.9; }
+        .search-box {
+            padding: 15px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        .filter-tabs {
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+            padding: 10px 15px;
+            background: #f9f9f9;
+            -webkit-overflow-scrolling: touch;
+        }
+        .filter-tab {
+            padding: 8px 15px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            font-size: 13px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-tab.active {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+        .results {
+            padding: 15px;
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
+        }
+        .card {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .card:active {
+            transform: scale(0.98);
+        }
+        .card.expanded {
+            border-color: #4CAF50;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .card-latin {
+            font-size: 13px;
+            color: #666;
+            font-style: italic;
+            margin: 3px 0 8px 0;
+        }
+        .expand-icon {
+            font-size: 20px;
+            transition: transform 0.3s;
+        }
+        .card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 8px;
+        }
+        .tag {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+        .details {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #f0f0f0;
+        }
+        .card.expanded .details {
+            display: block;
+        }
+        .detail-section {
+            margin-bottom: 12px;
+        }
+        .detail-title {
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .detail-content {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #555;
+        }
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        footer {
+            background: #f5f5f5;
+            padding: 15px;
+            text-align: center;
+            font-size: 11px;
+            color: #666;
+        }
+        @media (max-width: 768px) {
+            body { padding: 0; }
+            .container { border-radius: 0; min-height: 100vh; }
+            h1 { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌿 Gemmoterapia Clinica</h1>
+            <p class="subtitle">56 Gemmoderivati - Fernando Piterà</p>
+        </header>
+        
+        <div class="search-box">
+            <input type="search" id="search" placeholder="Cerca per nome, patologia o sistema..." autocomplete="off" />
+        </div>
+        
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="tutti">Tutti (56)</button>
+            <button class="filter-tab" data-filter="respiratorio">Respiratorio</button>
+            <button class="filter-tab" data-filter="cardiovascolare">Cardiovascolare</button>
+            <button class="filter-tab" data-filter="nervoso">Sistema Nervoso</button>
+            <button class="filter-tab" data-filter="osteoarticolare">Osteoarticolare</button>
+            <button class="filter-tab" data-filter="gastroenterico">Gastroenterico</button>
+            <button class="filter-tab" data-filter="urogenitale">Urogenitale</button>
+        </div>
+        
+        <div class="results" id="results">
+            <div style="text-align:center; padding:40px; color:#4CAF50;">
+                ⏳ Caricamento database...
+            </div>
+        </div>
+        
+        <footer>
+            <strong>Database Gemmoterapia Clinica</strong><br>
+            Basato su: Fernando Piterà "Compendio di Gemmoterapia Clinica"
+        </footer>
+    </div>
+
+    <script>
+        // DATABASE COMPLETO - 56 GEMMODERIVATI
+        const db = [
+            {n:"Carpino bianco",l:"Carpinus betulus",t:["piastrine","coagulazione","sinusite","respiratorio"],i:"Piastrinopenie acquisite, trombocitopenie anticoagulanti, sinusiti croniche, bronchiti croniche, tosse spasmodica, colite spastica",d:"30-50 gocce 2-3 volte/die. NON oltre 6-8 settimane consecutive.",a:"Alnus (sinusite), Ribes nigrum, Cornus sanguinea (emorragie)"},
+            {n:"Ribes nero",l:"Ribes nigrum",t:["cortisone","antinfiammatorio","allergie","asma"],i:"Cortison-like POTENTE. Tutte le forme di allergia, asma allergico, bronchite cronica, rinite allergica, artrite, artrosi, tutte le sindromi infiammatorie",d:"50-100 gocce MATTINO. Stati acuti: 100 gocce ogni ora fino miglioramento. FONDAMENTALE quasi ogni trattamento",a:"Si associa a QUASI TUTTO! Base di ogni trattamento antinfiammatorio"},
+            {n:"Tiglio argenteo",l:"Tilia tomentosa",t:["ansia","insonnia","nervosismo","sedativo","palpitazioni"],i:"Ansia e stati ansiosi, insonnia adulti bambini gestanti, attacchi panico, palpitazioni cardiache, tachicardia aritmie, ipertensione da stress, colite spastica",d:"50-70 gocce 1-2 volte/die, ultima dose 1h prima dormire. PRIVO TOSSICITÀ. Sicuro gravidanza/pediatria/geriatria",a:"Crataegus (palpitazioni ipertensione), Ficus (gastroduodenite stress), Vaccinium vitis idaea (colon irritabile)"},
+            {n:"Mirtillo rosso",l:"Vaccinium vitis idaea",t:["colon","cistite","menopausa","enterocolite"],i:"Colite, colon irritabile, colite mucomembranosa, cistiti recidivanti, enterocolite, disbiosi intestinale, menopausa, osteoporosi femminile",d:"40-50 gocce 2 volte/die DOPO pasti principali. Cistiti: con Calluna. Menopausa: con Rubus idaeus",a:"Tilia (colon spastico), Calluna (cistiti), Rubus idaeus (menopausa), Ficus carica (colite)"},
+            {n:"Fico",l:"Ficus carica",t:["gastrite","ulcera","stress","psicosomatico"],i:"Gastrite, ulcera gastroduodenale, colite, ansia con somatizzazione gastrica, disturbi psicosomatici digestivi, colon irritabile",d:"50 gocce 2-3 volte/die PRIMA pasti. Nelle urgenze gastrite acuta: ogni 2 ore fino miglioramento",a:"Tilia (stress), Vaccinium vitis (colon), Alnus (ulcera), Ribes (eritema solare)"},
+            {n:"Ontano nero",l:"Alnus glutinosa",t:["sinusite","flogosi","mucose","catarro"],i:"Sinusiti croniche suppurative, riniti croniche, flogosi mucose respiratorie, catarri cronici, rinofaringiti, tracheobronchiti",d:"50 gocce 3 volte/die. Sinusite cronica ribelle: 50 gocce Ribes + Carpinus + Alnus 3 volte/die per 3-6 mesi (cicli 3 settimane/mese)",a:"Carpinus + Ribes (sinusite ribelle), Rosa canina, Betula pubescens"},
+            {n:"Betulla pelosa",l:"Betula pubescens",t:["drenante","detox","ossa","crescita"],i:"Drenaggio renale, ritenzione idrica, osteoporosi, rachitismo, turbe crescita, rinofaringiti infanzia, adenoiditi, stimolante generale",d:"50 gocce mattino a digiuno. Cure drenaggio: 3 settimane/mese per 2-3 mesi. Osteoporosi: con Abies o Pinus",a:"Betula verrucosa linfa (drenaggio profondo), Abies (ossa), Ribes + Rosa canina (ORL infanzia)"},
+            {n:"Noce",l:"Juglans regia",t:["pancreas","disbiosi","diabete","cute"],i:"Pancreatiti croniche, disbiosi intestinale, diabete (coadiuvante), dermatosi, acne pustolosa, eczema, linfoadenopatie, insufficienza pancreatica",d:"50 gocce 2 volte/die prima pranzo e cena (pancreatiti, meteorismo). Disbiosi: 2-3 mesi di cura. Acne: con Ulmus",a:"Vaccinium vitis (diarree da antibiotici), Ulmus + Ribes (acne), Vitis vinifera (linfoadenomegalie)"},
+            {n:"Sequoia gigante",l:"Sequoia gigantea",t:["prostata","andropausa","osteoporosi","anziano"],i:"Ipertrofia prostatica, adenoma prostatico, andropausa, senescenza maschile, astenia sessuale, osteoporosi senile, sclerosi cerebrale anziano",d:"50-70 gocce mattino prima colazione. Cicli 20 giorni/mese per più mesi. NON oltre 6-8 settimane consecutive",a:"Ribes (prostatite), Rubus idaeus (fibroma uterino), Quercus (andropausa), Pinus + Rubus fructicosus (osteoporosi)"},
+            {n:"Biancospino",l:"Crataegus oxyacantha",t:["cuore","palpitazioni","ipertensione","aritmia"],i:"Palpitazioni, tachicardia, extrasistoli, aritmie cardiache, ipertensione arteriosa, insufficienza cardiaca lieve, precordialgie, spasmi coronarici",d:"50 gocce 2-3 volte/die. Può essere usato per LUNGHI PERIODI con elevatissima sicurezza. Associare a Tilia (ansia) e Olea (ipertensione)",a:"Tilia (ansia palpitazioni), Olea europaea + Viscum album (ipertensione), Syringa (post-infarto)"},
+            {n:"Lampone",l:"Rubus idaeus",t:["ovaie","ciclo","menopausa","utero"],i:"Regolatore ciclo mestruale, dismenorrea, amenorrea, oligomenorrea, menopausa precoce, sindrome premestruale, cisti ovariche, fibroma uterino",d:"50-70 gocce/die in unica somministrazione. Amenorrea: 30-50 gocce 2-3 volte/die a mesi alterni. Menopausa: con Vaccinium vitis",a:"Vaccinium vitis idaea (senescenza femminile), Ribes + Sequoia (fibroma), Tilia (dismenorrea), Salix alba amenti"},
+            {n:"Lantana Viburno",l:"Viburnum lantana",t:["asma","allergie","polmone","spasmo"],i:"Asma bronchiale allergico, bronchiti croniche asmatiformi, allergie respiratorie acute e croniche, riniti vasomotorie spasmodiche, eczema atopico",d:"50 gocce/die. Asma: SEMPRE associare Ribes nigrum (50-70 gocce/die). Enfisema: con Corylus",a:"Ribes (asma allergie acute), Rosmarinus (allergie croniche), Corylus (enfisema), Melittis (eczema atopico)"},
+            {n:"Frassino maggiore",l:"Fraxinus excelsior",t:["gotta","urico","reni","articolazioni"],i:"Gotta, iperuricemia, artrite gottosa, litiasi urica, oliguria, cellulite, ritenzione idrica, artrosi",d:"50 gocce 2-3 volte/die prima pasti. Gotta acuta: con Ribes nigrum. Cellulite: con Betula linfa",a:"Ribes + Ulmus (gotta), Juniperus (iperuricemia), Betula verrucosa linfa (cellulite ritenzione)"},
+            {n:"Pioppo nero",l:"Populus nigra",t:["arterie","bronchi","cistite"],i:"Arteriopatie croniche arti inferiori, bronchiti croniche, tracheiti recidivanti, cistiti recidivanti, uretriti, reumatismi",d:"50 gocce 2 volte/die. NON oltre 30-40 giorni consecutivi (può aumentare α2-globuline se uso prolungato). Bronchiti: con Alnus + Juglans",a:"Alnus + Ginkgo (insufficienza arteriosa), Carpinus + Ribes (tracheite), Cercis (arteriopatie trombotiche)"},
+            {n:"Avena coltivata",l:"Avena sativa",t:["nervosismo","insonnia","sedativo"],i:"Nervosismo, insonnia, ansia, astenia nervosa, esaurimento nervoso, dipendenze (tabacco alcool), convalescenza",d:"50 gocce 2 volte/die. NON usare in: allergia graminacee, celiachia. CONTROINDICATO: ipertiroidismo, Morbo Basedow",a:"Tilia (ansia insonnia), Ficus (somatizzazioni), Prunus spinosa (astenia)"},
+            {n:"Magnolia",l:"Magnolia denudata",t:["naso","rinite","sinusite","turbinati"],i:"Riniti croniche, rinite allergica, rinite ipertrofica, ipertrofia turbinati, ostruzione nasale, sinusiti, corizza, raffreddore cronico",d:"30-40 gocce prima pasti. Sinusite: con Alnus + Betula + Juglans + Ribes. Allergia: con Ribes + Viburnum",a:"Alnus + Betula + Juglans + Ribes (sinusite cronica), Ribes + Rosa + Viburnum (allergie respiratorie)"},
+            {n:"Olivello spinoso",l:"Hippophae rhamnoides",t:["immunità","influenza","vitamine"],i:"Deficit immunitari, prevenzione influenza e malattie infettive, astenia, convalescenza, stimolante immunitario, deficit visivi",d:"40-50 gocce 2 volte/die. Prevenzione invernale: cicli autunno-inverno. Associare Alnus + Betula + Rosa (infezioni recidivanti)",a:"Alnus + Betula + Rosa (prevenzione infezioni), Quercus (astenia), Vaccinium myrtillus (vista)"},
+            {n:"Pero comune",l:"Pyrus communis",t:["prostata","vescica","detox"],i:"Ipertrofia prostatica benigna, congestione prostatica, cistiti croniche, detossificazione chemio-radioterapia, osteoporosi",d:"50 gocce 2-3 volte/die. Prostata: 50 gocce Sequoia mattino + 50 Pyrus sera (cicli 3 mesi). Chemioterapia: supporto detossificante",a:"Sequoia (ipertrofia prostatica), Calluna (cistiti), Vitis vinifera (chemioterapia)"},
+            {n:"Segale",l:"Secale cereale",t:["fegato","epatite","cirrosi"],i:"Insufficienza epatica, epatiti croniche, cirrosi epatica iniziale, steatosi epatica, intossicazioni epatiche. NON usare: allergia graminacee, celiachia",d:"30-40 gocce 2-3 volte/die prima pasti. Cure lunghe anche mesi. Cirrosi: con Corylus + Juniperus. Epatite: con Juniperus + Ribes",a:"Corylus + Juniperus (cirrosi fibrosi), Juniperus + Ribes (epatite), Rosmarinus (insufficienza epatica)"},
+            {n:"Rovo",l:"Rubus fructicosus",t:["polmone","enfisema","osteoporosi"],i:"Enfisema polmonare, insufficienza respiratoria, osteoporosi, bronchiti croniche ostruttive, fibromi uterini",d:"50-70 gocce/die. Enfisema: con Corylus + Aesculus. Osteoporosi: con Pinus + Rosa. Fibroma: con Alnus incana + Vaccinium vitis",a:"Corylus + Aesculus (enfisema), Pinus + Rosa (osteoporosi anziano), Sequoia + Vaccinium vitis (osteoporosi)"},
+            {n:"Mais Granoturco",l:"Zea mays",t:["infarto","coronarie","miocardio"],i:"Post-infarto miocardico, insufficienza coronarica, sequele infarto, prevenzione recidive, miocardio-sclerosi, calcolosi urica fosfatica",d:"50 gocce 2 volte/die. Post-infarto: associare Cornus (prevenzione) + Syringa (vasodilatazione) + Crataegus",a:"Cornus (prevenzione trombi), Syringa (vasodilatazione coronarica), Crataegus (cuore post-infarto)"},
+            {n:"Giuggiolo",l:"Zizyphus jujuba",t:["ansia","insonnia","nervoso"],i:"Ansia, insonnia, nervosismo, irritabilità, palpitazioni da ansia, sindrome ansioso-depressiva, somatizzazioni ansiose",d:"40-50 gocce 2 volte/die. Insonnia: 50-70 gocce sera 1h prima dormire. Associare Tilia (ansia) Crataegus (palpitazioni)",a:"Tilia (ansia insonnia), Crataegus (palpitazioni ansiose), Ficus (somatizzazioni gastriche)"},
+            {n:"Abete bianco",l:"Abies pectinata",t:["ossa","crescita","bambini","rachitismo"],i:"Decalcificazione ossea, rachitismo, turbe crescita bambini, demineralizzazione, ritardi dentizione, adenoiditi bambini, otiti recidivanti",d:"30-40 gocce 2 volte/die. Bambini: adattare età/peso. Crescita: con Betula + Prunus spinosa. ORL bambini: con Ribes + Rosa",a:"Betula pubescens (osteoblastico crescita), Prunus spinosa (armonizza crescita), Ribes + Rosa + Betula (ORL infanzia)"},
+            {n:"Acero campestre",l:"Acer campestre",t:["colecisti","bile","calcoli","nevralgie"],i:"Litiasi biliare, colecistiti, discinesie biliari, colecistopatie, insufficienza biliare, nevralgie, sciatica",d:"50 gocce 3 volte/die prima pasti. Colica biliare: 100 gocce ogni ora fino miglioramento. Associare Rosmarinus (fegato)",a:"Rosmarinus + Tilia (colica biliare), Raphanus (discinesie), Taraxacum (insufficienza biliare)"},
+            {n:"Ippocastano",l:"Aesculus hippocastanum",t:["vene","emorroidi","gambe","varici"],i:"Insufficienza venosa arti inferiori, varici, emorroidi, gambe pesanti, stasi venosa, fragilità capillare, flebiti",d:"50 gocce 2-3 volte/die. Emorroidi acute: 100 gocce 3 volte/die. Gambe pesanti: con Castanea + Sorbus",a:"Castanea + Sorbus (stasi venosa gambe), Hamamelis (emorroidi), Vaccinium myrtillus (fragilità capillare)"},
+            {n:"Ontano bianco",l:"Alnus incana",t:["fibromi","utero","menopausa"],i:"Fibromi uterini, emicranie menopausa, vampate calore, dismenorrea, mastopatie fibrocistiche, osteoporosi postmenopausa",d:"50 gocce 2 volte/die. Fibromi: con Rubus idaeus + Vaccinium vitis idaea. Menopausa: con Rubus idaeus",a:"Rubus idaeus + Vaccinium vitis (fibromi), Rubus fructicosus (osteoporosi menopausa)"},
+            {n:"Vite vergine",l:"Ampelopsis veitchii",t:["articolazioni","infiammazioni","reumatismi","fibrosi"],i:"Artrite reumatoide, poliartrite cronica evolutiva, reumatismo infiammatorio, fibrosi tessutale, morbo Dupuytren, periartrite",d:"50 gocce 2-3 volte/die. Artrite: con Ribes + Pinus + Vitis vinifera. Dupuytren: con Ribes",a:"Ribes + Pinus + Vitis (artrite grave), Buxus (fibrosi), Ribes (morbo Dupuytren)"},
+            {n:"Corbezzolo",l:"Arbutus unedo",t:["prostata","vescica","uretra"],i:"Prostatiti, cistiti, uretriti, ipertrofia prostatica, disuria, pollachiuria, enuresi",d:"50 gocce 2-3 volte/die. Prostatite: con Sequoia + Ribes + Calluna. Enuresi bambini: con Quercus",a:"Sequoia + Ribes + Calluna (prostatite cronica), Quercus (enuresi), Vaccinium vitis (cistiti)"},
+            {n:"Betulla verrucosa LINFA",l:"Betula verrucosa linfa",t:["drenaggio","urico","cellulite","detox"],i:"Drenaggio profondo, iperuricemia, cellulite, ritenzione idrica, edemi, gotta, artrite gottosa, oliguria",d:"50-100 gocce mattino a digiuno in acqua. Cure drenaggio: 3 settimane consecutive. Cellulite: con Fraxinus",a:"Fraxinus (gotta iperuricemia), Betula pubescens (drenaggio renale), Juniperus (depurazione)"},
+            {n:"Betulla verrucosa SEMI",l:"Betula verrucosa semi",t:["memoria","cervello","sclerosi","anziano"],i:"Disturbi memoria, sclerosi cerebrale, involuzione cerebrale senile, astenia psichica, psicoastenia, depressione anziano",d:"50 gocce mattino + 50 gocce metà pomeriggio. Alzheimer: con Ginkgo biloba. Memoria: con Ginkgo + Rosmarinus",a:"Ginkgo biloba (memoria Alzheimer), Rosmarinus (memoria), Alnus + Olea (sclerosi cerebrale)"},
+            {n:"Bosso",l:"Buxus sempervirens",t:["fegato","colesterolo","reumatismi","detox"],i:"Insufficienza epatica, ipercolesterolemia, reumatismi, gotta, detossificazione, azione depurativa epatica. MASSIMO 40 giorni",d:"30 gocce 2-3 volte/die. NON oltre 40 giorni consecutivi. NON gravidanza/allattamento/infanzia. SOLO su prescrizione medica",a:"Ampelopsis (fibrosi reumatismi), Rosmarinus (fegato), Olea (colesterolo)"},
+            {n:"Brugo Erica",l:"Calluna vulgaris",t:["cistite","vie urinarie","prostata"],i:"Cistiti recidivanti batteriche, infezioni vie urinarie, colibacillosi, prostatiti croniche, uretriti, litiasi urica",d:"50 gocce 3 volte/die. Cistite acuta: ogni 2-3 ore fino miglioramento. Associare Vaccinium vitis idaea (colibacillosi)",a:"Vaccinium vitis idaea (cistiti colibacillosi), Populus (uretriti), Juniperus (vie urinarie)"},
+            {n:"Castagno",l:"Castanea vesca",t:["linfedema","stasi","gambe","circolazione"],i:"Linfedema arti inferiori, stasi linfatica, insufficienza venosa gambe pesanti, varici, flebiti, cellulite",d:"50 gocce 2-3 volte/die. Gambe pesanti: con Aesculus + Sorbus. Linfedema: con Pyrus + Sorbus",a:"Aesculus + Sorbus (insufficienza venosa), Pyrus (linfedema), Sorbus (edemi linfatici)"},
+            {n:"Cedro del Libano",l:"Cedrus libani",t:["cute","psoriasi","dermatosi","eczema"],i:"Psoriasi, dermatosi secche squamose, eczema secco, ittiosi, prurito cutaneo cronico, dermatiti croniche",d:"50 gocce 2 volte/die. Psoriasi: con Platanus + Secale. Eczema: con Ulmus + Ribes",a:"Platanus + Secale (psoriasi), Ulmus + Ribes (eczema), Cedrus (prurito cronico)"},
+            {n:"Albero di Giuda",l:"Cercis siliquastrum",t:["trombosi","arterie","coagulazione"],i:"Arteriopatie obliteranti, trombosi arteriose e venose, tromboflebiti, sequele tromboemboliche, claudicatio intermittens",d:"50 gocce 2-3 volte/die. Tromboflebiti: con Prunus amygdalus. Prevenzione trombi: con Cornus",a:"Prunus amygdalus (tromboflebiti), Cornus (prevenzione trombi), Populus (arteriopatie)"},
+            {n:"Cisto",l:"Cistus ladaniferus",t:["infezioni","bambini","immunità"],i:"Infezioni ricorrenti bambini, deficit immunitari pediatrici, otiti recidivanti, rinofaringiti, tonsilliti, influenze ricorrenti",d:"30-40 gocce 2 volte/die bambini. Prevenzione: cicli autunno-inverno. Con Rosa canina + Abies (immunità bambini)",a:"Rosa canina + Abies (immunità bambini), Ribes (infezioni), Hippophae (immunostimolante)"},
+            {n:"Limone SCORZA",l:"Citrus limonum scorza",t:["sangue","fluidificante","fibrinogeno"],i:"Iperfibrinogenemia, sindrome iperviscosità ematica, prevenzione trombi, fluidificante sanguigno, ipercolesterolemia",d:"50 gocce 2 volte/die lontano pasti. Fibrinogeno alto: con Tilia. Colesterolo: con Olea",a:"Tilia (iperfibrinogenemia), Olea (colesterolo), Cornus (prevenzione trombi)"},
+            {n:"Sanguinello",l:"Cornus sanguinea",t:["tiroide","Basedow","coagulazione","trombi"],i:"Morbo di Basedow, ipertiroidismo, prevenzione trombosi e infarto, gozzo tiroideo, tireotossicosi",d:"50 gocce mattino. Basedow: con Viburnum + Crataegus + Tilia. Prevenzione trombi post-infarto: con Zea mays",a:"Viburnum + Crataegus + Tilia (Basedow), Zea mays (post-infarto), Rosa canina (gozzo)"},
+            {n:"Nocciolo",l:"Corylus avellana",t:["polmone","enfisema","fegato","anemia"],i:"Enfisema polmonare, insufficienza respiratoria cronica, bronchite cronica ostruttiva, cirrosi epatica, fibrosi epatica, anemia",d:"50 gocce 2-3 volte/die. Enfisema: con Viburnum + Rubus fructicosus. Cirrosi: con Secale + Juniperus",a:"Viburnum + Rubus (enfisema), Secale + Juniperus (cirrosi), Tamarix (anemia)"},
+            {n:"Faggio",l:"Fagus sylvatica",t:["reni","uremias","insufficienza renale"],i:"Insufficienza renale cronica lieve-moderata, uremia, albuminuria, glomerulonefriti croniche, nefrosclerosi",d:"50 gocce 2-3 volte/die. Insufficienza renale: cicli prolungati mesi. Con Betula pubescens (drenaggio renale)",a:"Betula pubescens (drenaggio renale), Juniperus (depurazione renale), Quercus (uremia)"},
+            {n:"Ginkgo biloba",l:"Ginkgo biloba",t:["memoria","cervello","circolazione","Alzheimer"],i:"Disturbi memoria, Alzheimer, demenza senile, arteriopatie cerebrali, acufeni, vertigini, claudicatio, arteriopatie periferiche",d:"50 gocce 2 volte/die. Alzheimer: con Betula semi + Olea. Memoria: con Betula semi + Rosmarinus",a:"Betula semi (memoria Alzheimer), Alnus + Olea (sclerosi cerebrale), Populus (arteriopatie arti)"},
+            {n:"Agrifoglio",l:"Ilex aquifolium",t:["febbre","infezioni","ipertensione"],i:"Sindromi febbrili, stati influenzali, infezioni acute, febbre alta, ipertensione arteriosa. NON gravidanza/allattamento/infanzia",d:"50 gocce 2-3 volte/die. Febbre: ogni 2 ore fino defervescenza. CONTROINDICATO anticoagulanti. SOLO prescrizione medica",a:"Ribes (febbre infezioni), Rosa canina (influenza), Alnus (infezioni respiratorie)"},
+            {n:"Ginepro comune",l:"Juniperus communis",t:["reni","fegato","depurazione","diabete"],i:"Insufficienza renale lieve, insufficienza epatica, depurazione epato-renale, diabete (coadiuvante), gotta, iperuricemia",d:"30-50 gocce 2 volte/die. Cure depurative: 3 settimane. Diabete: con Olea + Morus. Fegato: con Rosmarinus + Secale",a:"Rosmarinus + Secale (fegato), Olea + Morus (diabete), Fraxinus (gotta iperuricemia)"},
+            {n:"Larice",l:"Larix decidua",t:["ossa","osteoporosi","fragilità"],i:"Osteoporosi, demineralizzazione ossea, fragilità ossea, rachitismo, turbe mineralizzazione, convalescenza fratture",d:"50 gocce 2 volte/die. Osteoporosi: con Pinus + Abies. Fratture: favorisce consolidamento",a:"Pinus + Abies (osteoporosi), Sequoia (osteoporosi anziano), Rosa canina (rimineralizzazione)"},
+            {n:"Ligustro",l:"Ligustrum vulgare",t:["bocca","gola","stomatiti","faringiti"],i:"Stomatiti, gengiviti, glossiti, faringiti, angine, afte boccali, candidosi orale. NON gravidanza/allattamento/bambini <6 anni",d:"30-50 gocce 2-3 volte/die. Stomatiti: uso locale (gargarismi) + sistemico. Associare Ribes (infiammazione)",a:"Ribes (infiammazione), Juglans (afte candidosi), Alnus (faringo-laringiti)"},
+            {n:"Lonicera nera",l:"Lonicera nigra",t:["tosse","laringite","bronchi"],i:"Tosse convulsiva, laringiti acute e croniche, tracheiti, bronchiti acute, tosse secca spasmodica, pertosse. NON gravidanza/allattamento/<6 anni",d:"30-50 gocce 3 volte/die. Tosse secca: Lonicera. Tosse asmatiforme: Viburnum. Laringite: con Ribes",a:"Ribes (laringite), Carpinus (tracheite), Viburnum (asma tosse)"},
+            {n:"Melo selvatico",l:"Malus sylvestris",t:["mente","ansia","panico","cefalea"],i:"Ansia, attacchi panico, cefalea vasomotoria, palpitazioni ansiose, claustrofobia, paure, ossessioni, stress mentale",d:"30-50 gocce 2-3 volte/die. Attacchi panico: ogni 2 ore fino miglioramento. Con Tilia (ansia) Crataegus (palpitazioni)",a:"Tilia + Crataegus (ansia palpitazioni), Alnus + Rosa (cefalea), Ficus (somatizzazioni)"},
+            {n:"Gelso nero",l:"Morus nigra",t:["diabete","glicemia","retinopatia"],i:"Diabete mellito (coadiuvante), iperglicemia, retinopatia diabetica, ulcere diabetiche, microangiopatia diabetica",d:"50 gocce 3 volte/die prima pasti. Diabete: con Olea + Juniperus. Retinopatia: con Vaccinium myrtillus",a:"Olea + Juniperus (diabete), Acer + Olea (iperglicemia), Vaccinium myrtillus (retinopatia)"},
+            {n:"Olivo",l:"Olea europaea",t:["colesterolo","pressione","diabete","arterie"],i:"Ipercolesterolemia, ipertensione arteriosa, diabete (coadiuvante), arteriosclerosi, prevenzione cardiovascolare, memoria anziano",d:"50 gocce 2-3 volte/die. Ipertensione: con Crataegus + Viscum. Colesterolo: con Rosmarinus. Diabete: con Morus + Juniperus",a:"Crataegus + Viscum (ipertensione), Rosmarinus (colesterolo steatosi), Morus + Juniperus (diabete)"},
+            {n:"Pino montano",l:"Pinus montana",t:["cartilagini","artrosi","ossa"],i:"Artrosi tutte localizzazioni, gonartrosi, coxartrosi, cervicoartrosi, condropatie, lesioni cartilaginee, osteoporosi",d:"50 gocce 2-3 volte/die. Artrosi: con Ribes + Vitis vinifera + Ampelopsis. Osteoporosi: con Abies + Larix",a:"Ribes + Vitis + Ampelopsis (artrosi grave), Abies + Larix (osteoporosi), Rosa canina (artrosi)"},
+            {n:"Platano orientale",l:"Platanus orientalis",t:["cute","psoriasi","prurito"],i:"Psoriasi, dermatosi desquamanti, prurito cronico, eczema, vitiligine, dermatiti croniche",d:"50 gocce 2-3 volte/die. Psoriasi: con Cedrus + Secale. Cure prolungate mesi",a:"Cedrus + Secale (psoriasi), Ulmus (dermatosi), Ribes (dermatiti)"},
+            {n:"Mandorlo",l:"Prunus amygdalus",t:["arterie","colesterolo","trombosi","sclerosi"],i:"Arteriosclerosi, ipercolesterolemia grave, tromboflebiti, sequele tromboemboliche, sclerosi vascolare, ipertrigliceridemia",d:"50 gocce 2-3 volte/die. Tromboflebiti: con Cercis + Populus. Colesterolo: con Olea + Rosmarinus",a:"Cercis + Populus (tromboflebiti), Olea + Rosmarinus (colesterolo trigliceridi), Ginkgo (arteriopatie)"},
+            {n:"Prugno selvatico",l:"Prunus spinosa",t:["energie","astenia","convalescenza","tonico"],i:"Astenia generale, convalescenza, esaurimento fisico, debilitazione, stimolante generale, tonico energetico, crescita bambini",d:"50 gocce 2 volte/die. Astenia: con Ribes + Quercus. Convalescenza: con Rosa canina. Crescita bambini: con Abies",a:"Ribes + Quercus (astenia), Rosa canina (convalescenza), Abies (crescita bambini)"},
+            {n:"Quercia",l:"Quercus pedunculata",t:["energie","stanchezza","andropausa","tonico"],i:"Astenia fisica e sessuale, ipoergia, andropausa, impotenza, senescenza, freddolosità, ipotensione, mancanza energia, enuresi",d:"50 gocce mattino. Andropausa: con Sequoia. Astenia: con Ribes + Prunus. Enuresi bambini: con Equisetum",a:"Sequoia (andropausa prostata), Ribes + Prunus (astenia), Betula amenti (energia sessuale)"},
+            {n:"Rosa canina",l:"Rosa canina",t:["bambini","immunità","crescita","infezioni"],i:"Infezioni ricorrenti infanzia, otiti rinofaringiti tonsilliti recidivanti bambini, stimolante immunità, crescita bambini, convalescenza",d:"30-50 gocce 2 volte/die bambini. Prevenzione invernale: cicli autunno-inverno. Con Ribes + Abies (ORL bambini)",a:"Ribes + Abies + Betula (ORL infanzia), Hippophae (immunità), Prunus spinosa (crescita)"},
+            {n:"Rosmarino",l:"Rosmarinus officinalis",t:["fegato","colesterolo","memoria","depurazione"],i:"Insufficienza epatica, steatosi epatica, ipercolesterolemia, disturbi memoria, allergie croniche, depurazione epatica, astenia",d:"50 gocce mattino a digiuno. Fegato: con Juniperus. Colesterolo: con Olea. Memoria: con Ginkgo + Betula semi",a:"Juniperus (fegato), Olea (colesterolo), Secale (epatite cirrosi), Ginkgo + Betula (memoria)"},
+            {n:"Salice bianco AMENTI",l:"Salix alba amenti",t:["ovaie","sessualità","libido"],i:"Frigidità, anafrodisia femminile, calo libido donne, amenorrea, oligomenorrea, sterilità femminile, dismenorrea",d:"50 gocce/die. Amenorrea: con Rubus idaeus. Libido: con Betula pubescens amenti. Sterilità: con Ficus + Rubus + Viburnum",a:"Rubus idaeus (ciclo amenorrea), Betula amenti (libido), Ficus + Viburnum (sterilità)"},
+            {n:"Salice bianco LINFA",l:"Salix alba linfa",t:["occhi","vista","cataratta","retina"],i:"Disturbi visione, cataratta iniziale, miodesopsie, opacità cristallino, retinopatia, deficit visivi, uveite",d:"50 gocce 2-3 volte/die. Cataratta: con Betula pubescens. Vista: con Vaccinium myrtillus. Retina: con Fraxinus",a:"Betula (cataratta), Vaccinium myrtillus (vista retina), Fraxinus + Ribes (retinopatia)"},
+            {n:"Sorbo domestico",l:"Sorbus domestica",t:["vene","acufeni","vertigini","tinnito"],i:"Acufeni, tinniti, vertigini, insufficienza venosa cerebrale, turbe circolazione orecchio interno, sindrome Ménière",d:"50 gocce 2-3 volte/die. Acufeni: con Ginkgo biloba. Vertigini: con Ginkgo. Associare Aesculus (circolazione)",a:"Ginkgo (acufeni vertigini), Aesculus + Castanea (insufficienza venosa), Ilex (vertigini)"},
+            {n:"Lillà Serenella",l:"Syringa vulgaris",t:["cuore","infarto","coronarie","angina"],i:"Insufficienza coronarica, angina pectoris, sequele infarto, spasmi coronarici, precordialgie, prevenzione infarto",d:"50 gocce 2-3 volte/die. Post-infarto: con Zea mays + Crataegus + Cornus. Angina: con Crataegus",a:"Zea mays + Crataegus (post-infarto), Cornus (prevenzione), Crataegus (angina coronarie)"},
+            {n:"Tamerice",l:"Tamarix gallica",t:["sangue","anemia","milza","piastrine"],i:"Anemia tutte forme, piastrinopenie, leucopenie, pancitopenie, splenomegalie, stimolante midollo osseo emopoietico",d:"50 gocce 2-3 volte/die. Anemia: con Rosa canina + Corylus. Piastrine: con Carpinus",a:"Rosa canina + Corylus (anemia), Carpinus (piastrinopenie), Vitis vinifera (mononucleosi)"},
+            {n:"Olmo campestre",l:"Ulmus campestris",t:["cute","acne","eczema","dermatiti"],i:"Acne, eczema umido, dermatiti seborroiche, impetigine, herpes cutaneo, piodermiti, dermatosi essudative",d:"50 gocce 2-3 volte/die. Acne: con Juglans + Ribes. Eczema: con Ribes + Cedrus. Herpes: con Rosa canina",a:"Juglans + Ribes (acne pustolosa), Ribes + Cedrus (eczema), Rosa (herpes recidivante)"},
+            {n:"Mirtillo nero",l:"Vaccinium myrtillus",t:["occhi","vista","retina","capillari"],i:"Retinopatia diabetica, degenerazioni retiniche, miglioramento vista, fragilità capillare, emorroidi, colibacillosi, diarrea infettiva",d:"40-50 gocce 2-3 volte/die. Vista: con Salix linfa. Retina: con Fraxinus + Ribes. Emorroidi: con Aesculus + Castanea",a:"Salix linfa (vista), Fraxinus + Ribes (retinopatia), Morus (diabete retina), Aesculus (emorroidi)"},
+            {n:"Vischio",l:"Viscum album",t:["pressione","ipertensione","oncologia"],i:"Ipertensione arteriosa, prevenzione cardiovascolare, oncologia (coadiuvante iniettabile), aritmie. NON gravidanza/allattamento. 1CH diluizione",d:"30-50 gocce 2 volte/die (1CH diluizione francese). Ipertensione: con Olea + Crataegus. NON anticoagulanti/immunosoppressori",a:"Olea + Crataegus + Tilia (ipertensione), Buxus (oncologia supporto). ATTENZIONE: uso medico prescrizione"},
+            {n:"Vite vinifera",l:"Vitis vinifera",t:["articolazioni","infiammazioni","oncologia"],i:"Artrite deformante, poliartrite cronica, reumatismo infiammatorio cronico, linfoadenopatie, linfomi (coadiuvante), fibromi, verruche",d:"50 gocce 2-3 volte/die. Artrite grave: con Ribes + Pinus + Ampelopsis. Linfomi: con Juglans (supporto oncologico)",a:"Ribes + Pinus + Ampelopsis (artrite), Juglans (linfoadenomegalie), Tamarix (mononucleosi)"}
+        ];
+
+        let currentFilter = 'tutti';
+        let searchTerm = '';
+
+        function renderResults() {
+            const container = document.getElementById('results');
+            let filtered = db;
+
+            // Filtro categoria
+            if (currentFilter !== 'tutti') {
+                filtered = filtered.filter(item => 
+                    item.t.some(tag => tag.includes(currentFilter)) ||
+                    item.i.toLowerCase().includes(currentFilter)
+                );
+            }
+
+            // Filtro ricerca
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                filtered = filtered.filter(item =>
+                    item.n.toLowerCase().includes(term) ||
+                    item.l.toLowerCase().includes(term) ||
+                    item.t.some(tag => tag.toLowerCase().includes(term)) ||
+                    item.i.toLowerCase().includes(term) ||
+                    item.d.toLowerCase().includes(term)
+                );
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="no-results"><div style="font-size:48px;">🔍</div><p>Nessun risultato trovato</p></div>';
+                return;
+            }
+
+            container.innerHTML = filtered.map(item => `
+                <div class="card" onclick="this.classList.toggle('expanded')">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-name">${item.n}</div>
+                            <div class="card-latin">${item.l}</div>
+                        </div>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="tags">
+                        ${item.t.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                    <div class="details">
+                        <div class="detail-section">
+                            <div class="detail-title">📋 Indicazioni Cliniche</div>
+                            <div class="detail-content">${item.i}</div>
+                        </div>
+                        <div class="detail-section">
+                            <div class="detail-title">💊 Posologia e Dosaggi</div>
+                            <div class="detail-content">${item.d}</div>
+                        </div>
+                        <div class="detail-section">
+                            <div class="detail-title">🤝 Associazioni Sinergiche</div>
+                            <div class="detail-content">${item.a}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Event listeners
+        document.getElementById('search').addEventListener('input', function(e) {
+            searchTerm = e.target.value.toLowerCase();
+            renderResults();
+        });
+
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                renderResults();
+            });
+        });
+
+        // Inizializza
+        renderResults();
+    </script>
+</body>
+</html>
