@@ -1,0 +1,3289 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Gemmoterapia">
+    <title>Gemmoterapia - Piterà</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding-top: 20px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .search-container {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 5px;
+        }
+        
+        .tab {
+            flex-shrink: 0;
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .tab.active {
+            background: white;
+            color: #667eea;
+        }
+        
+        .results {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-height: calc(100vh - 350px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .gem-card {
+            border-bottom: 1px solid #e0e0e0;
+            padding: 15px 0;
+            cursor: pointer;
+        }
+        
+        .gem-card:last-child {
+            border-bottom: none;
+        }
+        
+        .gem-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .gem-latin {
+            font-size: 14px;
+            font-style: italic;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .gem-indications {
+            font-size: 13px;
+            color: #888;
+            line-height: 1.4;
+        }
+        
+        .detail-view {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            z-index: 1000;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .detail-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            padding-top: calc(env(safe-area-inset-top) + 20px);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .back-button {
+            background: rgba(255,255,255,0.3);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+        
+        .detail-content {
+            padding: 20px;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .section-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .dosage-box {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        
+        .dosage-label {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+        
+        .synergy-item {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        
+        ul {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+        
+        li {
+            margin: 5px 0;
+        }
+
+        .stats {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌿 Gemmoterapia</h1>
+            <p>Fernando Piterà - Consultazione Clinica</p>
+        </div>
+        
+        <div class="stats" id="stats">Caricamento...</div>
+        
+        <div class="search-container">
+            <input type="text" 
+                   class="search-input" 
+                   id="searchInput" 
+                   placeholder="Cerca patologia, sintomo o pianta...">
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" data-category="all">Tutti</button>
+            <button class="tab" data-category="respiratorio">Respiratorio</button>
+            <button class="tab" data-category="cardiovascolare">Cardiovascolare</button>
+            <button class="tab" data-category="digestivo">Digestivo</button>
+            <button class="tab" data-category="nervoso">Nervoso</button>
+            <button class="tab" data-category="articolare">Articolare</button>
+            <button class="tab" data-category="urogenitale">Urogenitale</button>
+        </div>
+        
+        <div class="results" id="results"></div>
+    </div>
+    
+    <div class="detail-view" id="detailView">
+        <div class="detail-header">
+            <button class="back-button" onclick="closeDetail()">← Indietro</button>
+            <h2 id="detailName"></h2>
+            <p id="detailLatin"></p>
+        </div>
+        <div class="detail-content" id="detailContent"></div>
+    </div>
+
+    <script>
+// Database completo gemmoderivati - Fernando Piterà
+const gemmoData = [
+    {
+        name: "Abete Bianco",
+        latin: "Abies pectinata",
+        categories: ["articolare", "respiratorio"],
+        indications: "Crescita bambini, rachitismo, osteoporosi, carie, adenoidi, tonsilliti",
+        properties: "Rimineralizzante, osteoblastico, immunostimolante pediatrico, antianemico",
+        dosage: {
+            adults: "30-50 gocce MG 1D, 2-3 volte al giorno prima dei pasti. Se associato: 50-70 gocce 1 volta al giorno",
+            children: "5-15 gocce 2-3 volte al giorno per rachitismo, ritardi crescita, adenoidi, tonsilliti, rinofaringiti",
+            concentrated: "3-5-7 gocce 1-3 volte al giorno"
+        },
+        clinicalUse: [
+            "Rachitismo, ritardi di crescita",
+            "Osteopenia, osteoporosi giovani",
+            "Decalcificazione ossea, demineralizzazione",
+            "Consolidamento fratture",
+            "Carie dentaria infantile, paradontosi",
+            "Adenoidi, tonsilliti ricorrenti",
+            "Rinofaringiti con ipertrofia linfonodale",
+            "Disturbi neuromuscolari da carenza calcio",
+            "Anemie (stimola eritropoiesi)"
+        ],
+        synergies: [
+            "Betula verrucosa gemme: associazione pediatrica per eccellenza, alternare per disordini crescita",
+            "Ribes nigrum + Rosa canina: rinofaringiti recidivanti, infiammazioni vie respiratorie",
+            "Pinus montana: fratture patologiche, osteoporosi avanzata",
+            "Betula pubescens: rachitismo, turbe accrescimento"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Sicuro per uso prolungato in pediatria"
+    },
+    {
+        name: "Ribes Nero",
+        latin: "Ribes nigrum",
+        categories: ["respiratorio", "articolare"],
+        indications: "Allergie, infiammazioni, dolori articolari, riniti, asma",
+        properties: "Cortisone-like naturale, antinfiammatorio, antistaminico, immunostimolante",
+        dosage: {
+            adults: "50 gocce MG 1D, 2-3 volte al giorno prima dei pasti. In fase acuta: 50-70 gocce 3 volte al giorno",
+            children: "15-30 gocce 1-2 volte al giorno secondo età e peso",
+            concentrated: "5-7 gocce 2-3 volte al giorno"
+        },
+        clinicalUse: [
+            "Allergie respiratorie e cutanee",
+            "Riniti allergiche e vasomotorie",
+            "Asma allergico e bronchiale",
+            "Artriti e artrosi",
+            "Stati infiammatori acuti e cronici",
+            "Orticaria, eczema",
+            "Stanchezza surrenalica",
+            "Prostatite cronica",
+            "Fibroma uterino"
+        ],
+        synergies: [
+            "Carpinus betulus: rinofaringiti, bronchiti croniche, sinusiti",
+            "Rosa canina: infezioni ricorrenti, stimolazione immunitaria",
+            "Betula pubescens: allergie, sistema immunitario",
+            "Alnus glutinosa: processi infiammatori acuti, sinusiti",
+            "Pinus montana + Vitis vinifera: artrosi"
+        ],
+        contraindications: "Cautela in ipertensione grave",
+        warnings: "Può aumentare pressione arteriosa a dosi elevate"
+    },
+    {
+        name: "Ontano Nero",
+        latin: "Alnus glutinosa",
+        categories: ["cardiovascolare", "digestivo", "nervoso"],
+        indications: "Cefalea, emicrania, tromboflebiti, arteriti, ulcere, sinusiti",
+        properties: "Antitrombotico, antinfiammatorio acuto, anticefalalgico, vasoprotettore",
+        dosage: {
+            adults: "30-50 gocce MG 1D, 2-3 volte al giorno. Cefalea acuta: 50 gocce ogni 4-6 ore. Prevenzione emicrania: 50-70 gocce/die con Rosa canina e Ribes nigrum per 2-3 mesi",
+            children: "Non raccomandato sotto i 12 anni",
+            concentrated: "3-5 gocce 2-3 volte al giorno"
+        },
+        clinicalUse: [
+            "Emicrania acuta e cronica",
+            "Cefalea vasomotoria",
+            "Emicrania digestiva",
+            "Stati di ipercoagulabilità, trombofilia",
+            "Tromboflebiti, flebiti",
+            "Arteriti degli arti inferiori",
+            "Ulcera gastroduodenale",
+            "Sinusiti, rinofaringiti",
+            "Processi infiammatori acuti"
+        ],
+        synergies: [
+            "Rosa canina + Ribes nigrum: prevenzione crisi emicrania (accorcia e distanzia le crisi)",
+            "Mentha acquatica + Ribes nigrum: emicrania o cefalea vasomotoria",
+            "Cornus sanguinea: tromboflebiti, arteriopatie",
+            "Sorbus domestica: arteriti obliteranti",
+            "Ficus carica + Vaccinium myrtillus: ulcera peptica",
+            "Ribes nigrum + Carpinus betulus: sinusiti ribelli (cicli 3 settimane)"
+        ],
+        contraindications: "Non associare a anticoagulanti senza controllo medico",
+        warnings: "Richiede monitoraggio coagulazione in terapie prolungate. Può usare dosi 4-10 volte superiori sotto controllo medico"
+    },
+    {
+        name: "Carpino",
+        latin: "Carpinus betulus",
+        categories: ["respiratorio"],
+        indications: "Tosse cronica, bronchiti, sinusiti, tracheiti, riniti",
+        properties: "Antispasmodico bronchiale, antinfiammatorio mucose respiratorie, riequilibrante proteine",
+        dosage: {
+            adults: "30-50 gocce MG 1D, 2-3 volte al giorno. Sinusiti ribelli: 50 gocce 3 volte/die con Ribes nigrum e Alnus glutinosa per cicli di 3 settimane",
+            children: "10-25 gocce 2 volte al giorno",
+            concentrated: "3-5 gocce 2-3 volte al giorno"
+        },
+        clinicalUse: [
+            "Tosse cronica secca o produttiva",
+            "Bronchite cronica del fumatore",
+            "Tracheiti ricorrenti",
+            "Sinusiti croniche e ribelli",
+            "Rinofaringiti recidivanti",
+            "Catarro bronchiale persistente",
+            "Emorragie da anticoagulanti",
+            "Disglobulinemie, piastrinopenie"
+        ],
+        synergies: [
+            "Ribes nigrum: bronchiti, tracheiti con componente infiammatoria",
+            "Betula pubescens: rinofaringiti recidivanti pediatriche",
+            "Corylus avellana: bronchite cronica",
+            "Alnus glutinosa + Ribes nigrum: sinusiti ribelli (50 gocce x3/die, cicli 3 settimane/mese per 3-6 mesi)"
+        ],
+        contraindications: "Non prescrivere oltre 6-8 settimane consecutive",
+        warnings: "Limitare uso ai dati biologici descritti"
+    },
+    {
+        name: "Fico",
+        latin: "Ficus carica",
+        categories: ["digestivo", "nervoso"],
+        indications: "Gastrite, ulcera, colite, ansia, stress, disturbi psicosomatici",
+        properties: "Protettivo gastrico, cicatrizzante, sedativo sistema nervoso, equilibrante neurovegetativo",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 2-3 volte al giorno lontano dai pasti. Disturbi acuti: 50-70 gocce fino a 3 volte/die",
+            children: "15-25 gocce 1-2 volte al giorno",
+            concentrated: "4-5 gocce 2-3 volte al giorno"
+        },
+        clinicalUse: [
+            "Gastrite acuta e cronica",
+            "Ulcera gastroduodenale",
+            "Colite spastica, colon irritabile",
+            "Reflusso gastroesofageo",
+            "Ansia con somatizzazioni digestive",
+            "Stress, tensione nervosa",
+            "Disturbi psicosomatici",
+            "Insonnia da ansia",
+            "Bulimia psicosomatica"
+        ],
+        synergies: [
+            "Tilia tomentosa: ansia, insonnia, spasmofilia",
+            "Vaccinium vitis idaea: colite, enterocolite",
+            "Alnus glutinosa + Vaccinium myrtillus: ulcera gastroduodenale",
+            "Juglans regia: disfunzioni digestive, aerofagia"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Sicuro anche per uso prolungato"
+    },
+    {
+        name: "Tiglio",
+        latin: "Tilia tomentosa",
+        categories: ["nervoso"],
+        indications: "Ansia, insonnia, nervosismo, palpitazioni, irritabilità, cefalea tensiva",
+        properties: "Sedativo, ansiolitico, spasmolitico, regolatore sistema neurovegetativo",
+        dosage: {
+            adults: "50-100 gocce MG 1D alla sera prima di coricarsi per l'insonnia. 40-50 gocce 2 volte/die per ansia",
+            children: "10-30 gocce alla sera, 20-40 gocce durante il giorno per ansia",
+            concentrated: "5-10 gocce alla sera, 4-5 gocce durante il giorno"
+        },
+        clinicalUse: [
+            "Insonnia, difficoltà ad addormentarsi",
+            "Ansia, angoscia, attacchi panico",
+            "Nervosismo, irritabilità",
+            "Palpitazioni da ansia",
+            "Distonie neurovegetative",
+            "Spasmofilia",
+            "Cefalea muscolo-tensiva",
+            "Sindrome ansiosa-depressiva",
+            "Epilessia piccolo male",
+            "Emicrania"
+        ],
+        synergies: [
+            "Ficus carica: disturbi psicosomatici, ansia con gastrite",
+            "Crataegus oxyacantha: palpitazioni, cardiopalmo",
+            "Ziziphus jujuba: insonnia grave, ansia importante",
+            "Acer campestre: nevrosi d'angoscia",
+            "Salix alba: cefalea muscolo-tensiva",
+            "Viscum album: ipereccitabilità nervosa"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Può potenziare effetto di sedativi farmacologici"
+    },
+    {
+        name: "Betulla Gemme",
+        latin: "Betula verrucosa (gemme)",
+        categories: ["articolare"],
+        indications: "Reumatismi, astenia, crescita, convalescenza, immunostimolante",
+        properties: "Rimineralizzante, immunomodulante, depurativo, tonificante",
+        dosage: {
+            adults: "50 gocce MG 1D, 1-2 volte al giorno",
+            children: "10-30 gocce/die secondo età, particolarmente indicato in pediatria",
+            concentrated: "5 gocce 1-2 volte al giorno"
+        },
+        clinicalUse: [
+            "Ritardi di crescita",
+            "Astenie, convalescenza",
+            "Reumatismi articolari",
+            "Rachitismo, osteoporosi",
+            "Deficit immunitari",
+            "Adenopatie, tonsilliti ricorrenti",
+            "Diatesi linfatica pediatrica",
+            "Iperplasia fibronodulare mammelle"
+        ],
+        synergies: [
+            "Abies pectinata: rachitismo, deficit crescita (alternare - associazione pediatrica eccellente)",
+            "Rosa canina: infezioni ricorrenti pediatriche",
+            "Ribes nigrum: allergie, immunomodulazione",
+            "Betula verrucosa linfa: drenaggio, depurazione"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Ottimale per terapie pediatriche prolungate"
+    },
+    {
+        name: "Betulla Linfa",
+        latin: "Betula verrucosa (linfa)",
+        categories: ["articolare"],
+        indications: "Drenaggio, depurazione, iperuricemia, cellulite, ritenzione",
+        properties: "Drenante, diuretico, depurativo, ipocolesterolemizzante, uricosurico",
+        dosage: {
+            adults: "50-100 gocce MG 1D, 1-2 volte/die a digiuno. Cure drenaggio: 3 settimane/mese per 2-3 mesi",
+            children: "20-40 gocce al giorno",
+            concentrated: "5-10 gocce 1-2 volte al giorno"
+        },
+        clinicalUse: [
+            "Drenaggio pre-terapeutico",
+            "Iperuricemia, gotta",
+            "Ritenzione idrica, edemi",
+            "Cellulite",
+            "Sovrappeso",
+            "Ipercolesterolemia lieve",
+            "Detossificazione generale"
+        ],
+        synergies: [
+            "Fraxinus excelsior: iperuricemia, gotta",
+            "Juniperus communis: drenaggio renale, cellulite",
+            "Castanea vesca: edemi linfatici, cellulite",
+            "Ampelopsis veitchii: prima del trattamento artriti"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Aumentare idratazione durante il trattamento"
+    },
+    {
+        name: "Biancospino",
+        latin: "Crataegus oxyacantha",
+        categories: ["cardiovascolare", "nervoso"],
+        indications: "Cardiopalmo, tachicardia, ipertensione lieve, ansia cardiaca",
+        properties: "Cardiotonico, regolatore ritmo, ipotensivo lieve, sedativo",
+        dosage: {
+            adults: "50 gocce MG 1D, 2-3 volte/die. Per insonnia: 50-100 gocce alla sera",
+            children: "20-30 gocce 1-2 volte al giorno",
+            concentrated: "5 gocce 2-3 volte al giorno"
+        },
+        clinicalUse: [
+            "Palpitazioni, tachicardia",
+            "Aritmie funzionali",
+            "Ipertensione arteriosa lieve",
+            "Ansia con manifestazioni cardiache",
+            "Insufficienza cardiaca lieve",
+            "Insonnia dell'anziano",
+            "Angoscia precordiale"
+        ],
+        synergies: [
+            "Tilia tomentosa: ansia, palpitazioni, insonnia",
+            "Olea europaea: ipertensione arteriosa",
+            "Viscum album: ipertensione, sclerosi vascolare",
+            "Ginkgo biloba: insufficienza circolatoria cerebrale"
+        ],
+        contraindications: "Attenzione nell'uso con digitalici",
+        warnings: "Non sostituisce terapie cardiologiche prescritte"
+    },
+    {
+        name: "Rosa Canina",
+        latin: "Rosa canina",
+        categories: ["respiratorio"],
+        indications: "Infezioni ricorrenti, otiti, tonsilliti, riniti, immunità bambini, cefalea vasomotoria",
+        properties: "Immunostimolante, antinfiammatorio, rimineralizzante, vitamina C naturale",
+        dosage: {
+            adults: "50 gocce MG 1D, 1-2 volte/die",
+            children: "10-30 gocce/die, particolarmente indicato in pediatria per infezioni ricorrenti",
+            concentrated: "5 gocce 1-2 volte al giorno"
+        },
+        clinicalUse: [
+            "Infezioni ORL ricorrenti pediatriche",
+            "Otiti recidivanti",
+            "Tonsilliti, faringiti",
+            "Riniti, rinofaringiti",
+            "Raffreddori frequenti",
+            "Prevenzione influenza",
+            "Convalescenza post-infettiva",
+            "Cefalea vasomotoria",
+            "Allergie respiratorie"
+        ],
+        synergies: [
+            "Ribes nigrum: infezioni respiratorie acute e ricorrenti",
+            "Betula verrucosa: deficit immunitari pediatrici",
+            "Abies pectinata: rinofaringiti con adenoidi",
+            "Carpinus betulus: bronchiti ricorrenti",
+            "Alnus glutinosa + Ribes nigrum: prevenzione emicrania",
+            "Mentha acquatica + Ribes nigrum: emicrania vasomotoria"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Sicuro per uso prolungato in pediatria"
+    },
+    {
+        name: "Noce",
+        latin: "Juglans regia",
+        categories: ["digestivo", "respiratorio"],
+        indications: "Disbiosi, pancreatiti, diabete, dermatiti, insufficienza pancreatica",
+        properties: "Riequilibrante flora intestinale, drenante pancreatico, ipoglicemizzante",
+        dosage: {
+            adults: "50 gocce MG 1D, 1-2 volte/die prima dei pasti",
+            children: "15-30 gocce al giorno",
+            concentrated: "5 gocce 1-2 volte al giorno"
+        },
+        clinicalUse: [
+            "Disbiosi intestinale",
+            "Pancreatiti croniche",
+            "Insufficienza pancreatica esocrina",
+            "Diabete mellito tipo 2 (coadiuvante)",
+            "Acne, dermatiti, suppurazioni cutanee",
+            "Aerofagia, meteorismo",
+            "Faringiti, laringiti",
+            "Leucorrea"
+        ],
+        synergies: [
+            "Vaccinium vitis idaea: disbiosi, colite",
+            "Ficus carica: digestione difficile, aerofagia",
+            "Morus nigra: diabete tipo 2",
+            "Olea europaea: arteriosclerosi diabetica",
+            "Rosmarinus officinalis: insufficienza epatica, drenaggio"
+        ],
+        contraindications: "Monitorare glicemia se in terapia ipoglicemizzante",
+        warnings: "Può potenziare effetto di farmaci antidiabetici"
+    },
+    {
+        name: "Frassino",
+        latin: "Fraxinus excelsior",
+        categories: ["articolare"],
+        indications: "Gotta, iperuricemia, artriti, tendiniti, edemi, litiasi",
+        properties: "Uricosurico, diuretico, antinfiammatorio articolare, anticellulitico, ipocolesterolemizzante",
+        dosage: {
+            adults: "30-50 gocce MG 1D, 2-3 volte/die",
+            children: "Adattare all'età",
+            concentrated: "3-5 gocce 2-3 volte al giorno"
+        },
+        clinicalUse: [
+            "Iperuricemia, gotta",
+            "Artriti, artrosi",
+            "Tendiniti, sinoviti",
+            "Edemi da insufficienza renale lieve",
+            "Litiasi renale e biliare",
+            "Cellulite",
+            "Ipercolesterolemia, iperfosforemia",
+            "Maculopatia essudativa",
+            "Obesità con epatopatia"
+        ],
+        synergies: [
+            "Betula verrucosa linfa: iperuricemia, gotta",
+            "Ampelopsis veitchii: infiammazioni articolari",
+            "Alnus glutinosa: gotta con componente vascolare",
+            "Populus nigra: artriti arti inferiori",
+            "Acer campestre: litiasi biliare"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Aumentare idratazione durante trattamento"
+    },
+    {
+        name: "Vite Rossa",
+        latin: "Vitis vinifera",
+        categories: ["cardiovascolare", "articolare"],
+        indications: "Varici, flebiti, emorroidi, fragilità capillare, menopausa, osteoporosi",
+        properties: "Venotonico, antiossidante, protettore vascolare, antinfiammatorio venoso, antifibrosclerotico",
+        dosage: {
+            adults: "50 gocce MG 1D, 2 volte/die",
+            children: "Non raccomandato",
+            concentrated: "5 gocce 2 volte al giorno"
+        },
+        clinicalUse: [
+            "Insufficienza venosa",
+            "Varici, varicosità",
+            "Emorroidi",
+            "Fragilità capillare",
+            "Flebiti superficiali",
+            "Gambe pesanti",
+            "Disturbi menopausali",
+            "Metrorragie",
+            "Osteoporosi senile",
+            "Fibromi uterini"
+        ],
+        synergies: [
+            "Sorbus domestica: varici, arteriopatie",
+            "Cornus sanguinea: flebiti",
+            "Castanea vesca: stasi venosa",
+            "Rubus idaeus: disturbi mestruali, menopausa",
+            "Ribes nigrum + Pinus montana: artrosi",
+            "Vaccinium vitis idaea: menopausa, osteoporosi"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Utile in preparazione interventi su varici"
+    },
+    {
+        name: "Mirtillo Rosso",
+        latin: "Vaccinium vitis idaea",
+        categories: ["digestivo", "urogenitale"],
+        indications: "Colite, cistite, enterocolite, disbiosi, menopausa, fibroma",
+        properties: "Antinfiammatorio intestinale e urogenitale, riequilibrante flora, antifibrosclerotico",
+        dosage: {
+            adults: "50 gocce MG 1D, 1-2 volte/die prima dei pasti",
+            children: "20-30 gocce al giorno",
+            concentrated: "5 gocce 1-2 volte al giorno"
+        },
+        clinicalUse: [
+            "Colite, enterocolite",
+            "Colon irritabile",
+            "Disbiosi intestinale",
+            "Cistiti recidivanti",
+            "Fibroma uterino",
+            "Disturbi menopausali",
+            "Osteoporosi post-menopausa",
+            "Diverticolosi"
+        ],
+        synergies: [
+            "Ficus carica: colite spastica",
+            "Juglans regia: disbiosi intestinale",
+            "Rubus idaeus: disturbi ginecologici",
+            "Alnus incana: fibroma uterino (cicli di 3 mesi)",
+            "Vitis vinifera: menopausa, osteoporosi"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Particolarmente indicato per patologie femminili"
+    },
+    {
+        name: "Lampone",
+        latin: "Rubus idaeus",
+        categories: ["urogenitale"],
+        indications: "Disturbi mestruali, menopausa, ovaio, utero, climaterio",
+        properties: "Regolatore ormonale femminile, tonificante uterino, regolatore ciclo",
+        dosage: {
+            adults: "50 gocce MG 1D, 1-2 volte/die. Seconda metà ciclo per sindrome premestruale",
+            children: "Non raccomandato prima della pubertà",
+            concentrated: "5 gocce 1-2 volte al giorno"
+        },
+        clinicalUse: [
+            "Dismenorrea",
+            "Sindrome premestruale",
+            "Irregolarità mestruali",
+            "Amenorrea",
+            "Menopausa, vampate",
+            "Fibromi uterini",
+            "Cisti ovariche funzionali",
+            "Ipofertilità femminile"
+        ],
+        synergies: [
+            "Vaccinium vitis idaea: disturbi ginecologici, menopausa",
+            "Alnus incana: fibroma uterino",
+            "Vitis vinifera: menopausa, metrorragie",
+            "Ribes nigrum: dismenorrea infiammatoria",
+            "Salix alba amenti: amenorrea, dismenorrea"
+        ],
+        contraindications: "Non usare in gravidanza (eccetto fine gravidanza su indicazione ostetrica)",
+        warnings: "Può regolarizzare cicli irregolari"
+    },
+    {
+        name: "Olivello Spinoso",
+        latin: "Hippophae rhamnoides",
+        categories: ["digestivo", "cardiovascolare"],
+        indications: "Arteriosclerosi, colesterolo, sequele infartuali, astenie, immunità",
+        properties: "Antiateromatoso, rigenerante tessutale, vitamina E, cicatrizzante cardiovascolare, immunostimolante",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 2 volte/die",
+            children: "20-30 gocce/die",
+            concentrated: "4-5 gocce 2 volte al giorno"
+        },
+        clinicalUse: [
+            "Arteriosclerosi",
+            "Ipercolesterolemia",
+            "Post-infarto miocardico",
+            "Sequele ischemia cerebrale",
+            "Gastrite atrofica",
+            "Cicatrizzazione ulcere",
+            "Astenie, convalescenza",
+            "Deficit immunitari",
+            "Prevenzione influenza"
+        ],
+        synergies: [
+            "Olea europaea: ipertensione, arteriosclerosi",
+            "Corylus avellana: enfisema, insufficienza respiratoria",
+            "Zea mays: post-infarto, cicatrizzazione miocardio",
+            "Alnus glutinosa: arteriopatie",
+            "Rosa canina: immunostimolazione"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Particolarmente utile nelle sequele ischemiche"
+    },
+    {
+        name: "Pino Montano",
+        latin: "Pinus montana",
+        categories: ["articolare"],
+        indications: "Artrosi, osteoporosi, cervicoartrosi, gonartrosi, fratture, demineralizzazione",
+        properties: "Osteoblastico, condroprotettore, rimineralizzante, antiartrosi co",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 3 volte/die se solo. 50-70 gocce 1 volta/die se associato. Può essere protratto per mesi",
+            children: "Adattare all'età e peso",
+            concentrated: "4-5-7 gocce 1-3 volte al giorno"
+        },
+        clinicalUse: [
+            "Artrosi articolare generalizzata",
+            "Artrosi 'giovani' 40-60 anni",
+            "Cervicoartrosi, dorsalgie",
+            "Coxartrosi, gonartrosi",
+            "Osteopenia, osteoporosi",
+            "Osteoporosi post-menopausa",
+            "Demineralizzazione scheletrica",
+            "Fratture ossee, ritardi consolidamento",
+            "Sinoviti, condropatie",
+            "Spondiloartrosi con osteofitosi"
+        ],
+        synergies: [
+            "Abies pectinata: fratture, decalcificazione",
+            "Ampelopsis veitchii: dorsalgie",
+            "Ribes nigrum + Vitis vinifera: varie forme artrosi",
+            "Rosa canina + Rubus fructicosus: sindromi artrosiche",
+            "Sequoia gigantea + Rubus fructicosus: osteoporosi senile maschile",
+            "Vaccinium vitis idaea + Vitis vinifera: osteoporosi menopausa"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Azione dolce e profonda, prescrizione protraibile per mesi"
+    },
+    {
+        name: "Sequoia Gigante",
+        latin: "Sequoia gigantea",
+        categories: ["urogenitale", "articolare"],
+        indications: "Prostata, andropausa, astenia sessuale, osteoporosi senile maschile",
+        properties: "Riattivante poliendocrino, androgeno-like, osteoblastico senile, tonificante",
+        dosage: {
+            adults: "50 gocce MG 1D, 1-2 volte/die",
+            children: "Non indicato",
+            concentrated: "5 gocce 1-2 volte al giorno"
+        },
+        clinicalUse: [
+            "Adenoma prostatico iniziale",
+            "Ipertrofia prostatica benigna",
+            "Prostatite cronica",
+            "Andropausa",
+            "Astenia sessuale maschile",
+            "Atrofia testicolare, ipospermia",
+            "Osteoporosi senile maschile",
+            "Fragilità ossea anziano",
+            "Insufficienza surrenalica",
+            "Ipotiroidismo con riduzione 17-chetosteroidi"
+        ],
+        synergies: [
+            "Ribes nigrum: prostatite cronica, iposurrenalismo",
+            "Quercus pedunculata: andropausa, insufficienza surrenale",
+            "Alnus incana: adenoma prostatico",
+            "Pinus montana + Rubus fructicosus: osteoporosi senile maschile",
+            "Betula pubescens: senescenza gonadi"
+        ],
+        contraindications: "Controindicate in: Morbo Cushing, tumori secernenti testicolo, tumori surrenalici/ovarici virilizzanti, gravidanza III trimestre",
+        warnings: "Stimola increzione 17-chetosteroidi. Valutazione medica necessaria"
+    },
+    {
+        name: "Sorbo",
+        latin: "Sorbus domestica",
+        categories: ["cardiovascolare"],
+        indications: "Varici, insufficienza venosa, arteriopatie, acufeni, vertigini",
+        properties: "Venotonico, vasocostrittore venoso, antitrombotico, protettore vascolare",
+        dosage: {
+            adults: "50-70 gocce MG 1D, 1-2 volte/die prima pasti. Prescrizione lunga per patologie recidivanti",
+            children: "Adattare all'età",
+            concentrated: "5-7 gocce 1-2 volte al giorno"
+        },
+        clinicalUse: [
+            "Varici, insufficienza venosa",
+            "Ulcere varicose arti inferiori",
+            "Emorroidi",
+            "Arteriopatie obliteranti",
+            "Gambe pesanti, edemi venosi",
+            "Acufeni, ronzii auricolari",
+            "Ipoacusia, otosclerosi",
+            "Vertigini con ronzii",
+            "Flebiti, tromboflebiti"
+        ],
+        synergies: [
+            "Aesculus hippocastanum: emorroidi, insufficienza venosa",
+            "Alnus glutinosa: tromboflebite",
+            "Castanea vesca: insufficienza venosa arti inferiori",
+            "Ilex aquifolium + Viburnum lantana: acufeni, otosclerosi",
+            "Castanea vesca + Juglans regia: ulcera varicosa"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Prescrizione lunga per patologie tendenzialmente recidivanti"
+    },
+    {
+        name: "Rovo",
+        latin: "Rubus fructicosus",
+        categories: ["articolare", "respiratorio"],
+        indications: "Artrosi senile, osteoporosi, enfisema, sclerosi tessuti, fibrosi",
+        properties: "Antifibrosclerotico, rimodellante tessutale, osteoblastico senile, antiartrosi co senile",
+        dosage: {
+            adults: "50-70 gocce MG 1D in unica somministrazione, oppure 30-50 gocce 2-3 volte/die",
+            children: "Adattare all'età",
+            concentrated: "5-7 gocce 1 volta/die o 3-5 gocce 2-3 volte/die"
+        },
+        clinicalUse: [
+            "Artrosi senile (dopo 60 anni)",
+            "Osteoporosi anziano",
+            "Osteoporosi post-menopausa",
+            "Enfisema polmonare",
+            "Bronchite cronica ostruttiva",
+            "Sclerosi parenchima polmonare",
+            "Fibromi uterini",
+            "Tendenze fibrosclerotiche utero, rene",
+            "Senescenza tessutale generalizzata"
+        ],
+        synergies: [
+            "Abies pectinata: osteopenia giovanile",
+            "Corylus avellana: bronchite cronica, enfisema, sclerosi polmonare",
+            "Pinus montana + Rosa canina: artrosi con osteoporosi",
+            "Sequoia gigantea + Vaccinium vitis idaea: osteoporosi anziano",
+            "Alnus incana + Vaccinium vitis idaea: fibroma uterino"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Indicato per patologie senili e degenerative"
+    },
+    {
+        name: "Salice Bianco",
+        latin: "Salix alba",
+        categories: ["articolare", "nervoso", "urogenitale"],
+        indications: "Artrosi dolorosa, febbre, cefalea, emicrania, dismenorrea, insonnia nervosa",
+        properties: "Antiflogistico, antipiretico, antalgico, sedativo, anafrodisiaco, regolatore ormonale",
+        dosage: {
+            adults: "Amenti 30-50 gocce per regolazione ormonale. Gemme 50-70 gocce/die. Scorza giovane ramo 50-70 gocce sera per artrosi dolorosa",
+            children: "Adattare all'età",
+            concentrated: "Ridurre a 1/10"
+        },
+        clinicalUse: [
+            "Artrosi dolorosa piccole articolazioni",
+            "Artralgie, artrite reumatoide",
+            "Cefalea, cefalea muscolo-tensiva, emicrania",
+            "Febbre, stati febbrili, influenza",
+            "Dismenorrea, amenorrea",
+            "Sindrome premestruale",
+            "Insonnia nervosa, eretismo sessuale",
+            "Lombalgia, gotta",
+            "Nevralgie reumatiche"
+        ],
+        synergies: [
+            "Rubus idaeus: amenorrea, dismenorrea",
+            "Tilia tomentosa: ansia, nervosismo, insonnia",
+            "Vaccinium vitis idaea: menopausa",
+            "Pinus montana + Vitis vinifera: artrosi, artralgie",
+            "Ampelopsis veitchii: periartrite"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Diverse preparazioni (amenti, gemme, scorza) per indicazioni specifiche"
+    },
+    {
+        name: "Acero Campestre",
+        latin: "Acer campestre",
+        categories: ["nervoso", "digestivo"],
+        indications: "Ansia, nevrosi, colecistopatie, diabete tipo 2, herpes, nevralgie",
+        properties: "Ansiolitico, coleretico, ipoglicemizzante, riequilibrante globuline, antivirale",
+        dosage: {
+            adults: "30-50 gocce MG 1D, 2-3 volte/die. Se associato: 50-70 gocce 1 volta/die. Non oltre 40 giorni consecutivi",
+            children: "15-30 gocce/die adattati all'età",
+            concentrated: "5-7 gocce 1-3 volte/die"
+        },
+        clinicalUse: [
+            "Nevrosi d'angoscia, attacchi panico",
+            "Nevrosi fobiche e ossessive",
+            "Colecistopatie, litiasi biliare",
+            "Diabete mellito tipo 2 (coadiuvante)",
+            "Herpes simplex, herpes zoster",
+            "Epatite C, AIDS (coadiuvante)",
+            "Nevralgie, paresi",
+            "Insufficienza immunitaria"
+        ],
+        synergies: [
+            "Fraxinus excelsior: litiasi biliare coledocica",
+            "Ginkgo biloba: morbo di Landry",
+            "Morus nigra: diabete tipo 2",
+            "Olea europaea: ipercolesterolemia + arteriosclerosi",
+            "Tilia tomentosa: nevrosi fobica, esiti paresi",
+            "Rosmarinus officinalis: discinesia biliare"
+        ],
+        contraindications: "Non prescrivere oltre 6 settimane consecutive",
+        warnings: "Prescrizione limitata ai dati biologici. Permette ad altri gemmoterapici di agire meglio"
+    },
+    {
+        name: "Castagno",
+        latin: "Castanea vesca",
+        categories: ["cardiovascolare"],
+        indications: "Insufficienza venosa, linfedema, varici, cellulite, stasi linfatica",
+        properties: "Linfotonico, drenante linfatico, venotonico, antiedemigeno",
+        dosage: {
+            adults: "50 gocce MG 1D, 2 volte/die",
+            children: "20-30 gocce/die",
+            concentrated: "5 gocce 2 volte/die"
+        },
+        clinicalUse: [
+            "Insufficienza venosa arti inferiori",
+            "Linfedema, edemi linfatici",
+            "Varici, varicosità",
+            "Cellulite edematosa",
+            "Stasi linfatica",
+            "Gambe pesanti",
+            "Ulcere varicose"
+        ],
+        synergies: [
+            "Sorbus domestica: insufficienza venosa, varici",
+            "Betula verrucosa linfa: cellulite, drenaggio",
+            "Ligustrum vulgare: linfedema",
+            "Vitis vinifera: stasi venosa"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Specifico per patologie linfovenose"
+    },
+    {
+        name: "Ontano Bianco",
+        latin: "Alnus incana",
+        categories: ["urogenitale", "cardiovascolare"],
+        indications: "Fibroma uterino, adenoma prostatico, trombosi, arteriti, cirrosi",
+        properties: "Antifibroma, antitrombotico potente, trofico cerebrovascolare, antinfiammatorio",
+        dosage: {
+            adults: "30-50 gocce MG 1D, 2 volte/die. Fibroma: 50 gocce 1-2 volte/die per 3 mesi, ripetere più volte nell'anno",
+            children: "Non indicato",
+            concentrated: "3-5 gocce 2 volte/die"
+        },
+        clinicalUse: [
+            "Fibroma uterino (riduce volume in 6-12 mesi)",
+            "Miomi uterini",
+            "Adenoma prostatico fase iniziale",
+            "Trombosi, stati trombotici gravi",
+            "Arteriti cerebrali",
+            "Cirrosi epatica",
+            "Morbo Alzheimer, Parkinson",
+            "Sclerosi multipla"
+        ],
+        synergies: [
+            "Rubus fructicosus + Vaccinium vitis idaea: fibroma uterino (cicli 3 mesi)",
+            "Sequoia gigantea: adenoma prostatico",
+            "Corylus avellana + Juniperus communis: cirrosi epatica",
+            "Betula pubescens: trombosi con biologia normale"
+        ],
+        contraindications: "Non in allattamento (riduce montata lattea - galattofugo)",
+        warnings: "Dosi 4-10 volte superiori per trombosi gravi sotto controllo medico"
+    },
+    {
+        name: "Ampelopsis (Vite Vergine)",
+        latin: "Ampelopsis veitchii",
+        categories: ["articolare"],
+        indications: "Artriti, tendiniti, sinoviti, periartriti, aderenze, Dupuytren",
+        properties: "Antinfiammatorio articolare potente, antifibrotico articolare, trofico sinovie",
+        dosage: {
+            adults: "30-50 gocce MG 1D, 2-3 volte/die prima pasti. Drenare prima con Betula verrucosa linfa. Se associato: 50-70 gocce 1 volta/die",
+            children: "Adattare età e peso",
+            concentrated: "3-5 gocce 2-3 volte/die"
+        },
+        clinicalUse: [
+            "Artriti, artrosi infiammatorie",
+            "Artrite reumatoide",
+            "Tendiniti, sinoviti",
+            "Periartriti scapolo-omerali",
+            "Morbo di Dupuytren",
+            "Aderenze post-infiammatorie",
+            "Fibroialinosi tessutale",
+            "Maculopatia essudativa",
+            "Edema essudativo retina"
+        ],
+        synergies: [
+            "Buxus sempervirens: Dupuytren, aderenze (alternare)",
+            "Ribes nigrum + Rosa canina: reumatismo iperalgico",
+            "Fraxinus excelsior: infiammazioni articolari",
+            "Betula verrucosa: tendiniti",
+            "Sequoia gigantea + Ribes nigrum + Tilia tomentosa: fibromialgie"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Drenare prima con Betula verrucosa linfa. Specifico per articolazioni, tendini, sinovie"
+    },
+    {
+        name: "Cornus Sanguinella",
+        latin: "Cornus sanguinea",
+        categories: ["cardiovascolare"],
+        indications: "Arteriti, coronariti, tromboflebiti, tiroide",
+        properties: "Anticoagulante, antitrombotico, trofico coronarie e arterie, antitiroideo",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 2-3 volte/die",
+            children: "Non specificato",
+            concentrated: "4-5 gocce 2-3 volte/die"
+        },
+        clinicalUse: [
+            "Arteriti, arteriopatie",
+            "Coronariti, angina pectoris",
+            "Tromboflebiti",
+            "Gozzo eutiroideo, adenoma tiroideo",
+            "Ipertiroidismo",
+            "Emorragie da anticoagulanti (con Carpinus)"
+        ],
+        synergies: [
+            "Alnus glutinosa: tromboflebiti, arteriopatie",
+            "Sorbus domestica: arteriti obliteranti",
+            "Rosa canina: gozzo eutiroideo",
+            "Carpinus betulus: emorragie da anticoagulanti"
+        ],
+        contraindications: "Cautela con anticoagulanti",
+        warnings: "Monitorare coagulazione"
+    },
+    {
+        name: "Nocciolo",
+        latin: "Corylus avellana",
+        categories: ["respiratorio", "digestivo"],
+        indications: "Enfisema, bronchite cronica, cirrosi, anemia, sclerosi polmonare",
+        properties: "Antifibrosclerotico polmonare ed epatico, antianemico, riparatore tessutale",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 2-3 volte/die",
+            children: "Adattare",
+            concentrated: "4-5 gocce 2-3 volte/die"
+        },
+        clinicalUse: [
+            "Enfisema polmonare",
+            "Bronchite cronica ostruttiva",
+            "Sclerosi parenchima polmonare",
+            "Cirrosi epatica",
+            "Anemia, anemie emolitiche",
+            "Epatosplenomegalia",
+            "Trombocitopenia"
+        ],
+        synergies: [
+            "Rubus fructicosus: bronchite cronica, enfisema, sclerosi polmonare",
+            "Carpinus betulus: bronchite cronica",
+            "Alnus incana + Juniperus communis: cirrosi epatica",
+            "Fagus sylvatica: bronchite ostruttiva enfisema"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Specifico per sclerosi tissutali polmonari ed epatiche"
+    },
+    {
+        name: "Ginepro",
+        latin: "Juniperus communis",
+        categories: ["digestivo", "urogenitale"],
+        indications: "Drenaggio renale, diabete, obesità, cellulite, insufficienza epatica",
+        properties: "Drenante renale, ipoglicemizzante, diuretico, depurativo, epatoprotettore",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 1-2 volte/die",
+            children: "20-30 gocce/die",
+            concentrated: "4-5 gocce 1-2 volte/die"
+        },
+        clinicalUse: [
+            "Drenaggio renale",
+            "Diabete tipo 2 (coadiuvante)",
+            "Obesità, sovrappeso",
+            "Cellulite",
+            "Insufficienza epatica lieve-media",
+            "Steatosi epatica",
+            "Ascite con epatomegalia",
+            "Cirrosi epatica"
+        ],
+        synergies: [
+            "Betula verrucosa linfa: drenaggio, cellulite",
+            "Alnus incana + Corylus avellana: cirrosi",
+            "Rosmarinus officinalis: insufficienza epatica, steatosi",
+            "Olea europaea: diabete, obesità"
+        ],
+        contraindications: "Non in gravidanza, nefropatie gravi",
+        warnings: "Aumentare idratazione"
+    },
+    {
+        name: "Olivo",
+        latin: "Olea europaea",
+        categories: ["cardiovascolare"],
+        indications: "Ipertensione, arteriosclerosi, diabete, ipercolesterolemia",
+        properties: "Ipotensivo, ipoglicemizzante, ipocolesterolemizzante, antiateromatoso",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 1-2 volte/die",
+            children: "Adattare",
+            concentrated: "4-5 gocce 1-2 volte/die"
+        },
+        clinicalUse: [
+            "Ipertensione arteriosa",
+            "Arteriosclerosi",
+            "Ipercolesterolemia",
+            "Diabete tipo 2",
+            "Obesità",
+            "Sindrome metabolica"
+        ],
+        synergies: [
+            "Crataegus + Tilia tomentosa: ipertensione",
+            "Viscum album: ipertensione, sclerosi",
+            "Acer campestre: ipercolesterolemia + arteriosclerosi",
+            "Morus nigra: diabete",
+            "Ginkgo biloba: arteriosclerosi cerebrale"
+        ],
+        contraindications: "Monitorare se in terapia antipertensiva",
+        warnings: "Può potenziare farmaci antipertensivi"
+    },
+    {
+        name: "Ginkgo",
+        latin: "Ginkgo biloba",
+        categories: ["cardiovascolare", "nervoso"],
+        indications: "Deficit cerebrali, vertigini, acufeni, arteriopatie, memoria",
+        properties: "Vasodilatatore cerebrale, antiossidante, neuroprotettore, antitrombotico",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 2 volte/die",
+            children: "Non prima 12 anni",
+            concentrated: "4-5 gocce 2 volte/die"
+        },
+        clinicalUse: [
+            "Deficit cerebrali vascolari anziano",
+            "Arteriosclerosi cerebrale",
+            "TIA, RIND",
+            "Vertigini, sindrome Ménière",
+            "Acufeni",
+            "Turbe memoria",
+            "Arteriopatie arti inferiori"
+        ],
+        synergies: [
+            "Alnus glutinosa + Olea europaea: deficit cerebrali",
+            "Buddleja davidii: vertigini",
+            "Acer campestre: morbo Landry",
+            "Crataegus: insufficienza circolatoria"
+        ],
+        contraindications: "Cautela con anticoagulanti",
+        warnings: "Monitorare coagulazione"
+    },
+    {
+        name: "Mirtillo Nero",
+        latin: "Vaccinium myrtillus",
+        categories: ["cardiovascolare", "digestivo"],
+        indications: "Retinopatia, fragilità capillare, diarrea, colite, vista",
+        properties: "Vasoprotettore microcircolo, antiossidante retinico, astringente intestinale",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 2 volte/die",
+            children: "20-30 gocce/die",
+            concentrated: "4-5 gocce 2 volte/die"
+        },
+        clinicalUse: [
+            "Retinopatia diabetica",
+            "Fragilità capillare",
+            "Disturbi visione notturna",
+            "Maculopatia",
+            "Diarrea, colite",
+            "Emorroidi",
+            "Ulcera peptica"
+        ],
+        synergies: [
+            "Buddleja davidii: nictalopia, cataratta",
+            "Ficus carica + Alnus glutinosa: ulcera",
+            "Vaccinium vitis idaea: colite"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Sicuro anche per uso prolungato"
+    },
+    {
+        name: "Viburno Lantana",
+        latin: "Viburnum lantana",
+        categories: ["respiratorio"],
+        indications: "Asma spasmodica, allergie respiratorie, eczema",
+        properties: "Antispasmodico bronchiale, antiallergico, sedativo respiratorio",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 2-3 volte/die",
+            children: "15-30 gocce/die",
+            concentrated: "4-5 gocce 2-3 volte/die"
+        },
+        clinicalUse: [
+            "Asma allergica spasmodica",
+            "Allergie respiratorie",
+            "Bronchiti spasmodiche",
+            "Dispnea asmatica",
+            "Eczema atopico"
+        ],
+        synergies: [
+            "Ribes nigrum: asma, allergie",
+            "Alnus glutinosa: asma allergica",
+            "Crataegus: asma cardiaca"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Specifico per componente spasmodica"
+    },
+    {
+        name: "Rosmarino",
+        latin: "Rosmarinus officinalis",
+        categories: ["digestivo"],
+        indications: "Insufficienza epatica, colecisti, colesterolo, steatosi, cirrosi",
+        properties: "Coleretico, colagogo, epatoprotettore, rigenerante epatico, detossificante",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 1-2 volte/die",
+            children: "Adattare",
+            concentrated: "4-5 gocce 1-2 volte/die"
+        },
+        clinicalUse: [
+            "Insufficienza epatica",
+            "Steatosi epatica",
+            "Cirrosi epatica",
+            "Colecistopatie",
+            "Ipercolesterolemia",
+            "Discinesia biliare",
+            "Epatiti croniche"
+        ],
+        synergies: [
+            "Juniperus communis: insufficienza epatica, steatosi, cirrosi",
+            "Acer campestre: discinesia biliare",
+            "Secale cereale: cirrosi, epatopatie gravi",
+            "Juglans regia: insufficienza pancreatico-epatica"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Potente epatoprotettore e rigenerante"
+    },
+    {
+        name: "Vischio",
+        latin: "Viscum album",
+        categories: ["cardiovascolare", "nervoso"],
+        indications: "Ipertensione, vertigini, epilessia, sciatica, tumori (coadiuvante)",
+        properties: "Ipotensivo, antispasmodico, antitumorale (coadiuvante), regolatore neurovegetativo",
+        dosage: {
+            adults: "30-40 gocce MG 1D o 1CH, 2 volte/die. La 1CH (1:100) rende più sicuro l'uso. Aumentare a 50-60 gocce se 1 volta/die associato",
+            children: "Valutazione medica necessaria",
+            concentrated: "3-6 gocce invece di 30-60 gocce"
+        },
+        clinicalUse: [
+            "Ipertensione arteriosa",
+            "Arteriosclerosi",
+            "Vertigini, sindrome Ménière",
+            "Epilessia piccolo male",
+            "Sciatica",
+            "Lombalgia irradiata",
+            "Tumori (solo coadiuvante)",
+            "Fibromialgie",
+            "Sindrome gambe senza riposo"
+        ],
+        synergies: [
+            "Olea europaea: ipertensione",
+            "Crataegus: ipertensione, cardiopatie",
+            "Tilia tomentosa: epilessia piccolo male, ipereccitabilità",
+            "Sorbus domestica: acufeni, vertigini",
+            "Alnus glutinosa: vasculopatie cerebrali"
+        ],
+        contraindications: "Non in gravidanza, allattamento. Uso orale limitato (preferire iniettabili per tumori)",
+        warnings: "Azione utero-tonica. Valutazione medica. Diluizione 1CH più sicura. Tossicità possibile a dosi eccessive"
+    },
+    {
+        name: "Quercia",
+        latin: "Quercus pedunculata",
+        categories: ["nervoso"],
+        indications: "Astenie, surrenali, andropausa, convalescenza",
+        properties: "Tonico generale, stimolante surrenalico, androgeno-like",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 1-2 volte/die",
+            children: "20-30 gocce/die",
+            concentrated: "4-5 gocce 1-2 volte/die"
+        },
+        clinicalUse: [
+            "Astenie, stanchezza",
+            "Insufficienza surrenalica",
+            "Andropausa",
+            "Convalescenza",
+            "Ipotensione"
+        ],
+        synergies: [
+            "Ribes nigrum: iposurrenalismo",
+            "Sequoia gigantea: andropausa",
+            "Betula pubescens: astenie"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Tonico potente"
+    }
+];
+
+        let currentCategory = 'all';
+        let searchTerm = '';
+
+        function updateStats() {
+            const total = gemmoData.length;
+            document.getElementById('stats').textContent = `${total} gemmoderivati disponibili`;
+        }
+
+        function renderResults() {
+            const filtered = gemmoData.filter(gem => {
+                const matchCategory = currentCategory === 'all' || gem.categories.includes(currentCategory);
+                const matchSearch = !searchTerm || 
+                    gem.name.toLowerCase().includes(searchTerm) ||
+                    gem.latin.toLowerCase().includes(searchTerm) ||
+                    gem.indications.toLowerCase().includes(searchTerm) ||
+                    gem.clinicalUse.some(use => use.toLowerCase().includes(searchTerm));
+                return matchCategory && matchSearch;
+            });
+
+            const resultsDiv = document.getElementById('results');
+            
+            if (filtered.length === 0) {
+                resultsDiv.innerHTML = '<div class="no-results">Nessun risultato trovato per la ricerca corrente</div>';
+                return;
+            }
+
+            resultsDiv.innerHTML = filtered.map(gem => `
+                <div class="gem-card" onclick="showDetail('${gem.latin.replace(/'/g, "\\'")}')">
+                    <div class="gem-name">${gem.name}</div>
+                    <div class="gem-latin">${gem.latin}</div>
+                    <div class="gem-indications">${gem.indications}</div>
+                </div>
+            `).join('');
+        }
+
+        function showDetail(latinName) {
+            const gem = gemmoData.find(g => g.latin === latinName);
+            if (!gem) return;
+
+            document.getElementById('detailName').textContent = gem.name;
+            document.getElementById('detailLatin').textContent = gem.latin;
+            
+            const content = `
+                <div class="section">
+                    <div class="section-title">Proprietà Principali</div>
+                    <div class="section-content">${gem.properties}</div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Posologia e Dosaggi</div>
+                    <div class="dosage-box">
+                        <div class="dosage-label">Adulti (MG 1D):</div>
+                        ${gem.dosage.adults}
+                    </div>
+                    ${gem.dosage.children ? `
+                    <div class="dosage-box">
+                        <div class="dosage-label">Bambini/Adolescenti:</div>
+                        ${gem.dosage.children}
+                    </div>
+                    ` : ''}
+                    <div class="dosage-box">
+                        <div class="dosage-label">Concentrato (non diluito):</div>
+                        ${gem.dosage.concentrated}
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Indicazioni Cliniche</div>
+                    <ul>
+                        ${gem.clinicalUse.map(use => `<li>${use}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Associazioni Sinergiche</div>
+                    ${gem.synergies.map(syn => `<div class="synergy-item">${syn}</div>`).join('')}
+                </div>
+
+                ${gem.contraindications ? `
+                <div class="section">
+                    <div class="section-title">Controindicazioni</div>
+                    <div class="warning-box">${gem.contraindications}</div>
+                </div>
+                ` : ''}
+
+                ${gem.warnings ? `
+                <div class="section">
+                    <div class="section-title">Avvertenze</div>
+                    <div class="section-content">${gem.warnings}</div>
+                </div>
+                ` : ''}
+            `;
+
+            document.getElementById('detailContent').innerHTML = content;
+            document.getElementById('detailView').style.display = 'block';
+        }
+
+        function closeDetail() {
+            document.getElementById('detailView').style.display = 'none';
+        }
+
+        // Event listeners
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentCategory = this.dataset.category;
+                renderResults();
+            });
+        });
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            searchTerm = e.target.value.toLowerCase();
+            renderResults();
+
+    <script>
+// Database completo gemmoderivati - Fernando Piterà
+const gemmoData = [
+    {
+        name: "Abete Bianco",
+        latin: "Abies pectinata",
+        categories: ["articolare", "respiratorio"],
+        indications: "Crescita bambini, rachitismo, osteoporosi, carie, adenoidi, tonsilliti",
+        properties: "Rimineralizzante, osteoblastico, immunostimolante pediatrico, antianemico",
+        dosage: {
+            adults: "30-50 gocce MG 1D, 2-3 volte al giorno prima dei pasti. Se associato: 50-70 gocce 1 volta al giorno",
+            children: "5-15 gocce 2-3 volte al giorno per rachitismo, ritardi crescita, adenoidi, tonsilliti, rinofaringiti",
+            concentrated: "3-5-7 gocce 1-3 volte al giorno"
+        },
+        clinicalUse: [
+            "Rachitismo, ritardi di crescita",
+            "Osteopenia, osteoporosi giovani",
+            "Decalcificazione ossea, demineralizzazione",
+            "Consolidamento fratture",
+            "Carie dentaria infantile, paradontosi",
+            "Adenoidi, tonsilliti ricorrenti",
+            "Rinofaringiti con ipertrofia linfonodale",
+            "Disturbi neuromuscolari da carenza calcio",
+            "Anemie (stimola eritropoiesi)"
+        ],
+        synergies: [
+            "Betula verrucosa gemme: associazione pediatrica per eccellenza, alternare per disordini crescita",
+            "Ribes nigrum + Rosa canina: rinofaringiti recidivanti, infiammazioni vie respiratorie",
+            "Pinus montana: fratture patologiche, osteoporosi avanzata",
+            "Betula pubescens: rachitismo, turbe accrescimento"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Sicuro per uso prolungato in pediatria"
+    },
+    {
+        name: "Ribes Nero",
+        latin: "Ribes nigrum",
+        categories: ["respiratorio", "articolare"],
+        indications: "Allergie, infiammazioni, dolori articolari, riniti, asma",
+        properties: "Cortisone-like naturale, antinfiammatorio, antistaminico, immunostimolante",
+        dosage: {
+            adults: "50 gocce MG 1D, 2-3 volte al giorno prima dei pasti. In fase acuta: 50-70 gocce 3 volte al giorno",
+            children: "15-30 gocce 1-2 volte al giorno secondo età e peso",
+            concentrated: "5-7 gocce 2-3 volte al giorno"
+        },
+        clinicalUse: [
+            "Allergie respiratorie e cutanee",
+            "Riniti allergiche e vasomotorie",
+            "Asma allergico e bronchiale",
+            "Artriti e artrosi",
+            "Stati infiammatori acuti e cronici",
+            "Orticaria, eczema",
+            "Stanchezza surrenalica",
+            "Prostatite cronica",
+            "Fibroma uterino"
+        ],
+        synergies: [
+            "Carpinus betulus: rinofaringiti, bronchiti croniche, sinusiti",
+            "Rosa canina: infezioni ricorrenti, stimolazione immunitaria",
+            "Betula pubescens: allergie, sistema immunitario",
+            "Alnus glutinosa: processi infiammatori acuti, sinusiti",
+            "Pinus montana + Vitis vinifera: artrosi"
+        ],
+        contraindications: "Cautela in ipertensione grave",
+        warnings: "Può aumentare pressione arteriosa a dosi elevate"
+    },
+    {
+        name: "Ontano Nero",
+        latin: "Alnus glutinosa",
+        categories: ["cardiovascolare", "digestivo", "nervoso"],
+        indications: "Cefalea, emicrania, tromboflebiti, arteriti, ulcere, sinusiti",
+        properties: "Antitrombotico, antinfiammatorio acuto, anticefalalgico, vasoprotettore",
+        dosage: {
+            adults: "30-50 gocce MG 1D, 2-3 volte al giorno. Cefalea acuta: 50 gocce ogni 4-6 ore. Prevenzione emicrania: 50-70 gocce/die con Rosa canina e Ribes nigrum per 2-3 mesi",
+            children: "Non raccomandato sotto i 12 anni",
+            concentrated: "3-5 gocce 2-3 volte al giorno"
+        },
+        clinicalUse: [
+            "Emicrania acuta e cronica",
+            "Cefalea vasomotoria",
+            "Emicrania digestiva",
+            "Stati di ipercoagulabilità, trombofilia",
+            "Tromboflebiti, flebiti",
+            "Arteriti degli arti inferiori",
+            "Ulcera gastroduodenale",
+            "Sinusiti, rinofaringiti",
+            "Processi infiammatori acuti"
+        ],
+        synergies: [
+            "Rosa canina + Ribes nigrum: prevenzione crisi emicrania (accorcia e distanzia le crisi)",
+            "Mentha acquatica + Ribes nigrum: emicrania o cefalea vasomotoria",
+            "Cornus sanguinea: tromboflebiti, arteriopatie",
+            "Sorbus domestica: arteriti obliteranti",
+            "Ficus carica + Vaccinium myrtillus: ulcera peptica",
+            "Ribes nigrum + Carpinus betulus: sinusiti ribelli (cicli 3 settimane)"
+        ],
+        contraindications: "Non associare a anticoagulanti senza controllo medico",
+        warnings: "Richiede monitoraggio coagulazione in terapie prolungate. Può usare dosi 4-10 volte superiori sotto controllo medico"
+    },
+    {
+        name: "Carpino",
+        latin: "Carpinus betulus",
+        categories: ["respiratorio"],
+        indications: "Tosse cronica, bronchiti, sinusiti, tracheiti, riniti",
+        properties: "Antispasmodico bronchiale, antinfiammatorio mucose respiratorie, riequilibrante proteine",
+        dosage: {
+            adults: "30-50 gocce MG 1D, 2-3 volte al giorno. Sinusiti ribelli: 50 gocce 3 volte/die con Ribes nigrum e Alnus glutinosa per cicli di 3 settimane",
+            children: "10-25 gocce 2 volte al giorno",
+            concentrated: "3-5 gocce 2-3 volte al giorno"
+        },
+        clinicalUse: [
+            "Tosse cronica secca o produttiva",
+            "Bronchite cronica del fumatore",
+            "Tracheiti ricorrenti",
+            "Sinusiti croniche e ribelli",
+            "Rinofaringiti recidivanti",
+            "Catarro bronchiale persistente",
+            "Emorragie da anticoagulanti",
+            "Disglobulinemie, piastrinopenie"
+        ],
+        synergies: [
+            "Ribes nigrum: bronchiti, tracheiti con componente infiammatoria",
+            "Betula pubescens: rinofaringiti recidivanti pediatriche",
+            "Corylus avellana: bronchite cronica",
+            "Alnus glutinosa + Ribes nigrum: sinusiti ribelli (50 gocce x3/die, cicli 3 settimane/mese per 3-6 mesi)"
+        ],
+        contraindications: "Non prescrivere oltre 6-8 settimane consecutive",
+        warnings: "Limitare uso ai dati biologici descritti"
+    },
+    {
+        name: "Fico",
+        latin: "Ficus carica",
+        categories: ["digestivo", "nervoso"],
+        indications: "Gastrite, ulcera, colite, ansia, stress, disturbi psicosomatici",
+        properties: "Protettivo gastrico, cicatrizzante, sedativo sistema nervoso, equilibrante neurovegetativo",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 2-3 volte al giorno lontano dai pasti. Disturbi acuti: 50-70 gocce fino a 3 volte/die",
+            children: "15-25 gocce 1-2 volte al giorno",
+            concentrated: "4-5 gocce 2-3 volte al giorno"
+        },
+        clinicalUse: [
+            "Gastrite acuta e cronica",
+            "Ulcera gastroduodenale",
+            "Colite spastica, colon irritabile",
+            "Reflusso gastroesofageo",
+            "Ansia con somatizzazioni digestive",
+            "Stress, tensione nervosa",
+            "Disturbi psicosomatici",
+            "Insonnia da ansia",
+            "Bulimia psicosomatica"
+        ],
+        synergies: [
+            "Tilia tomentosa: ansia, insonnia, spasmofilia",
+            "Vaccinium vitis idaea: colite, enterocolite",
+            "Alnus glutinosa + Vaccinium myrtillus: ulcera gastroduodenale",
+            "Juglans regia: disfunzioni digestive, aerofagia"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Sicuro anche per uso prolungato"
+    },
+    {
+        name: "Tiglio",
+        latin: "Tilia tomentosa",
+        categories: ["nervoso"],
+        indications: "Ansia, insonnia, nervosismo, palpitazioni, irritabilità, cefalea tensiva",
+        properties: "Sedativo, ansiolitico, spasmolitico, regolatore sistema neurovegetativo",
+        dosage: {
+            adults: "50-100 gocce MG 1D alla sera prima di coricarsi per l'insonnia. 40-50 gocce 2 volte/die per ansia",
+            children: "10-30 gocce alla sera, 20-40 gocce durante il giorno per ansia",
+            concentrated: "5-10 gocce alla sera, 4-5 gocce durante il giorno"
+        },
+        clinicalUse: [
+            "Insonnia, difficoltà ad addormentarsi",
+            "Ansia, angoscia, attacchi panico",
+            "Nervosismo, irritabilità",
+            "Palpitazioni da ansia",
+            "Distonie neurovegetative",
+            "Spasmofilia",
+            "Cefalea muscolo-tensiva",
+            "Sindrome ansiosa-depressiva",
+            "Epilessia piccolo male",
+            "Emicrania"
+        ],
+        synergies: [
+            "Ficus carica: disturbi psicosomatici, ansia con gastrite",
+            "Crataegus oxyacantha: palpitazioni, cardiopalmo",
+            "Ziziphus jujuba: insonnia grave, ansia importante",
+            "Acer campestre: nevrosi d'angoscia",
+            "Salix alba: cefalea muscolo-tensiva",
+            "Viscum album: ipereccitabilità nervosa"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Può potenziare effetto di sedativi farmacologici"
+    },
+    {
+        name: "Betulla Gemme",
+        latin: "Betula verrucosa (gemme)",
+        categories: ["articolare"],
+        indications: "Reumatismi, astenia, crescita, convalescenza, immunostimolante",
+        properties: "Rimineralizzante, immunomodulante, depurativo, tonificante",
+        dosage: {
+            adults: "50 gocce MG 1D, 1-2 volte al giorno",
+            children: "10-30 gocce/die secondo età, particolarmente indicato in pediatria",
+            concentrated: "5 gocce 1-2 volte al giorno"
+        },
+        clinicalUse: [
+            "Ritardi di crescita",
+            "Astenie, convalescenza",
+            "Reumatismi articolari",
+            "Rachitismo, osteoporosi",
+            "Deficit immunitari",
+            "Adenopatie, tonsilliti ricorrenti",
+            "Diatesi linfatica pediatrica",
+            "Iperplasia fibronodulare mammelle"
+        ],
+        synergies: [
+            "Abies pectinata: rachitismo, deficit crescita (alternare - associazione pediatrica eccellente)",
+            "Rosa canina: infezioni ricorrenti pediatriche",
+            "Ribes nigrum: allergie, immunomodulazione",
+            "Betula verrucosa linfa: drenaggio, depurazione"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Ottimale per terapie pediatriche prolungate"
+    },
+    {
+        name: "Betulla Linfa",
+        latin: "Betula verrucosa (linfa)",
+        categories: ["articolare"],
+        indications: "Drenaggio, depurazione, iperuricemia, cellulite, ritenzione",
+        properties: "Drenante, diuretico, depurativo, ipocolesterolemizzante, uricosurico",
+        dosage: {
+            adults: "50-100 gocce MG 1D, 1-2 volte/die a digiuno. Cure drenaggio: 3 settimane/mese per 2-3 mesi",
+            children: "20-40 gocce al giorno",
+            concentrated: "5-10 gocce 1-2 volte al giorno"
+        },
+        clinicalUse: [
+            "Drenaggio pre-terapeutico",
+            "Iperuricemia, gotta",
+            "Ritenzione idrica, edemi",
+            "Cellulite",
+            "Sovrappeso",
+            "Ipercolesterolemia lieve",
+            "Detossificazione generale"
+        ],
+        synergies: [
+            "Fraxinus excelsior: iperuricemia, gotta",
+            "Juniperus communis: drenaggio renale, cellulite",
+            "Castanea vesca: edemi linfatici, cellulite",
+            "Ampelopsis veitchii: prima del trattamento artriti"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Aumentare idratazione durante il trattamento"
+    },
+    {
+        name: "Biancospino",
+        latin: "Crataegus oxyacantha",
+        categories: ["cardiovascolare", "nervoso"],
+        indications: "Cardiopalmo, tachicardia, ipertensione lieve, ansia cardiaca",
+        properties: "Cardiotonico, regolatore ritmo, ipotensivo lieve, sedativo",
+        dosage: {
+            adults: "50 gocce MG 1D, 2-3 volte/die. Per insonnia: 50-100 gocce alla sera",
+            children: "20-30 gocce 1-2 volte al giorno",
+            concentrated: "5 gocce 2-3 volte al giorno"
+        },
+        clinicalUse: [
+            "Palpitazioni, tachicardia",
+            "Aritmie funzionali",
+            "Ipertensione arteriosa lieve",
+            "Ansia con manifestazioni cardiache",
+            "Insufficienza cardiaca lieve",
+            "Insonnia dell'anziano",
+            "Angoscia precordiale"
+        ],
+        synergies: [
+            "Tilia tomentosa: ansia, palpitazioni, insonnia",
+            "Olea europaea: ipertensione arteriosa",
+            "Viscum album: ipertensione, sclerosi vascolare",
+            "Ginkgo biloba: insufficienza circolatoria cerebrale"
+        ],
+        contraindications: "Attenzione nell'uso con digitalici",
+        warnings: "Non sostituisce terapie cardiologiche prescritte"
+    },
+    {
+        name: "Rosa Canina",
+        latin: "Rosa canina",
+        categories: ["respiratorio"],
+        indications: "Infezioni ricorrenti, otiti, tonsilliti, riniti, immunità bambini, cefalea vasomotoria",
+        properties: "Immunostimolante, antinfiammatorio, rimineralizzante, vitamina C naturale",
+        dosage: {
+            adults: "50 gocce MG 1D, 1-2 volte/die",
+            children: "10-30 gocce/die, particolarmente indicato in pediatria per infezioni ricorrenti",
+            concentrated: "5 gocce 1-2 volte al giorno"
+        },
+        clinicalUse: [
+            "Infezioni ORL ricorrenti pediatriche",
+            "Otiti recidivanti",
+            "Tonsilliti, faringiti",
+            "Riniti, rinofaringiti",
+            "Raffreddori frequenti",
+            "Prevenzione influenza",
+            "Convalescenza post-infettiva",
+            "Cefalea vasomotoria",
+            "Allergie respiratorie"
+        ],
+        synergies: [
+            "Ribes nigrum: infezioni respiratorie acute e ricorrenti",
+            "Betula verrucosa: deficit immunitari pediatrici",
+            "Abies pectinata: rinofaringiti con adenoidi",
+            "Carpinus betulus: bronchiti ricorrenti",
+            "Alnus glutinosa + Ribes nigrum: prevenzione emicrania",
+            "Mentha acquatica + Ribes nigrum: emicrania vasomotoria"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Sicuro per uso prolungato in pediatria"
+    },
+    {
+        name: "Noce",
+        latin: "Juglans regia",
+        categories: ["digestivo", "respiratorio"],
+        indications: "Disbiosi, pancreatiti, diabete, dermatiti, insufficienza pancreatica",
+        properties: "Riequilibrante flora intestinale, drenante pancreatico, ipoglicemizzante",
+        dosage: {
+            adults: "50 gocce MG 1D, 1-2 volte/die prima dei pasti",
+            children: "15-30 gocce al giorno",
+            concentrated: "5 gocce 1-2 volte al giorno"
+        },
+        clinicalUse: [
+            "Disbiosi intestinale",
+            "Pancreatiti croniche",
+            "Insufficienza pancreatica esocrina",
+            "Diabete mellito tipo 2 (coadiuvante)",
+            "Acne, dermatiti, suppurazioni cutanee",
+            "Aerofagia, meteorismo",
+            "Faringiti, laringiti",
+            "Leucorrea"
+        ],
+        synergies: [
+            "Vaccinium vitis idaea: disbiosi, colite",
+            "Ficus carica: digestione difficile, aerofagia",
+            "Morus nigra: diabete tipo 2",
+            "Olea europaea: arteriosclerosi diabetica",
+            "Rosmarinus officinalis: insufficienza epatica, drenaggio"
+        ],
+        contraindications: "Monitorare glicemia se in terapia ipoglicemizzante",
+        warnings: "Può potenziare effetto di farmaci antidiabetici"
+    },
+    {
+        name: "Frassino",
+        latin: "Fraxinus excelsior",
+        categories: ["articolare"],
+        indications: "Gotta, iperuricemia, artriti, tendiniti, edemi, litiasi",
+        properties: "Uricosurico, diuretico, antinfiammatorio articolare, anticellulitico, ipocolesterolemizzante",
+        dosage: {
+            adults: "30-50 gocce MG 1D, 2-3 volte/die",
+            children: "Adattare all'età",
+            concentrated: "3-5 gocce 2-3 volte al giorno"
+        },
+        clinicalUse: [
+            "Iperuricemia, gotta",
+            "Artriti, artrosi",
+            "Tendiniti, sinoviti",
+            "Edemi da insufficienza renale lieve",
+            "Litiasi renale e biliare",
+            "Cellulite",
+            "Ipercolesterolemia, iperfosforemia",
+            "Maculopatia essudativa",
+            "Obesità con epatopatia"
+        ],
+        synergies: [
+            "Betula verrucosa linfa: iperuricemia, gotta",
+            "Ampelopsis veitchii: infiammazioni articolari",
+            "Alnus glutinosa: gotta con componente vascolare",
+            "Populus nigra: artriti arti inferiori",
+            "Acer campestre: litiasi biliare"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Aumentare idratazione durante trattamento"
+    },
+    {
+        name: "Vite Rossa",
+        latin: "Vitis vinifera",
+        categories: ["cardiovascolare", "articolare"],
+        indications: "Varici, flebiti, emorroidi, fragilità capillare, menopausa, osteoporosi",
+        properties: "Venotonico, antiossidante, protettore vascolare, antinfiammatorio venoso, antifibrosclerotico",
+        dosage: {
+            adults: "50 gocce MG 1D, 2 volte/die",
+            children: "Non raccomandato",
+            concentrated: "5 gocce 2 volte al giorno"
+        },
+        clinicalUse: [
+            "Insufficienza venosa",
+            "Varici, varicosità",
+            "Emorroidi",
+            "Fragilità capillare",
+            "Flebiti superficiali",
+            "Gambe pesanti",
+            "Disturbi menopausali",
+            "Metrorragie",
+            "Osteoporosi senile",
+            "Fibromi uterini"
+        ],
+        synergies: [
+            "Sorbus domestica: varici, arteriopatie",
+            "Cornus sanguinea: flebiti",
+            "Castanea vesca: stasi venosa",
+            "Rubus idaeus: disturbi mestruali, menopausa",
+            "Ribes nigrum + Pinus montana: artrosi",
+            "Vaccinium vitis idaea: menopausa, osteoporosi"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Utile in preparazione interventi su varici"
+    },
+    {
+        name: "Mirtillo Rosso",
+        latin: "Vaccinium vitis idaea",
+        categories: ["digestivo", "urogenitale"],
+        indications: "Colite, cistite, enterocolite, disbiosi, menopausa, fibroma",
+        properties: "Antinfiammatorio intestinale e urogenitale, riequilibrante flora, antifibrosclerotico",
+        dosage: {
+            adults: "50 gocce MG 1D, 1-2 volte/die prima dei pasti",
+            children: "20-30 gocce al giorno",
+            concentrated: "5 gocce 1-2 volte al giorno"
+        },
+        clinicalUse: [
+            "Colite, enterocolite",
+            "Colon irritabile",
+            "Disbiosi intestinale",
+            "Cistiti recidivanti",
+            "Fibroma uterino",
+            "Disturbi menopausali",
+            "Osteoporosi post-menopausa",
+            "Diverticolosi"
+        ],
+        synergies: [
+            "Ficus carica: colite spastica",
+            "Juglans regia: disbiosi intestinale",
+            "Rubus idaeus: disturbi ginecologici",
+            "Alnus incana: fibroma uterino (cicli di 3 mesi)",
+            "Vitis vinifera: menopausa, osteoporosi"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Particolarmente indicato per patologie femminili"
+    },
+    {
+        name: "Lampone",
+        latin: "Rubus idaeus",
+        categories: ["urogenitale"],
+        indications: "Disturbi mestruali, menopausa, ovaio, utero, climaterio",
+        properties: "Regolatore ormonale femminile, tonificante uterino, regolatore ciclo",
+        dosage: {
+            adults: "50 gocce MG 1D, 1-2 volte/die. Seconda metà ciclo per sindrome premestruale",
+            children: "Non raccomandato prima della pubertà",
+            concentrated: "5 gocce 1-2 volte al giorno"
+        },
+        clinicalUse: [
+            "Dismenorrea",
+            "Sindrome premestruale",
+            "Irregolarità mestruali",
+            "Amenorrea",
+            "Menopausa, vampate",
+            "Fibromi uterini",
+            "Cisti ovariche funzionali",
+            "Ipofertilità femminile"
+        ],
+        synergies: [
+            "Vaccinium vitis idaea: disturbi ginecologici, menopausa",
+            "Alnus incana: fibroma uterino",
+            "Vitis vinifera: menopausa, metrorragie",
+            "Ribes nigrum: dismenorrea infiammatoria",
+            "Salix alba amenti: amenorrea, dismenorrea"
+        ],
+        contraindications: "Non usare in gravidanza (eccetto fine gravidanza su indicazione ostetrica)",
+        warnings: "Può regolarizzare cicli irregolari"
+    },
+    {
+        name: "Olivello Spinoso",
+        latin: "Hippophae rhamnoides",
+        categories: ["digestivo", "cardiovascolare"],
+        indications: "Arteriosclerosi, colesterolo, sequele infartuali, astenie, immunità",
+        properties: "Antiateromatoso, rigenerante tessutale, vitamina E, cicatrizzante cardiovascolare, immunostimolante",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 2 volte/die",
+            children: "20-30 gocce/die",
+            concentrated: "4-5 gocce 2 volte al giorno"
+        },
+        clinicalUse: [
+            "Arteriosclerosi",
+            "Ipercolesterolemia",
+            "Post-infarto miocardico",
+            "Sequele ischemia cerebrale",
+            "Gastrite atrofica",
+            "Cicatrizzazione ulcere",
+            "Astenie, convalescenza",
+            "Deficit immunitari",
+            "Prevenzione influenza"
+        ],
+        synergies: [
+            "Olea europaea: ipertensione, arteriosclerosi",
+            "Corylus avellana: enfisema, insufficienza respiratoria",
+            "Zea mays: post-infarto, cicatrizzazione miocardio",
+            "Alnus glutinosa: arteriopatie",
+            "Rosa canina: immunostimolazione"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Particolarmente utile nelle sequele ischemiche"
+    },
+    {
+        name: "Pino Montano",
+        latin: "Pinus montana",
+        categories: ["articolare"],
+        indications: "Artrosi, osteoporosi, cervicoartrosi, gonartrosi, fratture, demineralizzazione",
+        properties: "Osteoblastico, condroprotettore, rimineralizzante, antiartrosi co",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 3 volte/die se solo. 50-70 gocce 1 volta/die se associato. Può essere protratto per mesi",
+            children: "Adattare all'età e peso",
+            concentrated: "4-5-7 gocce 1-3 volte al giorno"
+        },
+        clinicalUse: [
+            "Artrosi articolare generalizzata",
+            "Artrosi 'giovani' 40-60 anni",
+            "Cervicoartrosi, dorsalgie",
+            "Coxartrosi, gonartrosi",
+            "Osteopenia, osteoporosi",
+            "Osteoporosi post-menopausa",
+            "Demineralizzazione scheletrica",
+            "Fratture ossee, ritardi consolidamento",
+            "Sinoviti, condropatie",
+            "Spondiloartrosi con osteofitosi"
+        ],
+        synergies: [
+            "Abies pectinata: fratture, decalcificazione",
+            "Ampelopsis veitchii: dorsalgie",
+            "Ribes nigrum + Vitis vinifera: varie forme artrosi",
+            "Rosa canina + Rubus fructicosus: sindromi artrosiche",
+            "Sequoia gigantea + Rubus fructicosus: osteoporosi senile maschile",
+            "Vaccinium vitis idaea + Vitis vinifera: osteoporosi menopausa"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Azione dolce e profonda, prescrizione protraibile per mesi"
+    },
+    {
+        name: "Sequoia Gigante",
+        latin: "Sequoia gigantea",
+        categories: ["urogenitale", "articolare"],
+        indications: "Prostata, andropausa, astenia sessuale, osteoporosi senile maschile",
+        properties: "Riattivante poliendocrino, androgeno-like, osteoblastico senile, tonificante",
+        dosage: {
+            adults: "50 gocce MG 1D, 1-2 volte/die",
+            children: "Non indicato",
+            concentrated: "5 gocce 1-2 volte al giorno"
+        },
+        clinicalUse: [
+            "Adenoma prostatico iniziale",
+            "Ipertrofia prostatica benigna",
+            "Prostatite cronica",
+            "Andropausa",
+            "Astenia sessuale maschile",
+            "Atrofia testicolare, ipospermia",
+            "Osteoporosi senile maschile",
+            "Fragilità ossea anziano",
+            "Insufficienza surrenalica",
+            "Ipotiroidismo con riduzione 17-chetosteroidi"
+        ],
+        synergies: [
+            "Ribes nigrum: prostatite cronica, iposurrenalismo",
+            "Quercus pedunculata: andropausa, insufficienza surrenale",
+            "Alnus incana: adenoma prostatico",
+            "Pinus montana + Rubus fructicosus: osteoporosi senile maschile",
+            "Betula pubescens: senescenza gonadi"
+        ],
+        contraindications: "Controindicate in: Morbo Cushing, tumori secernenti testicolo, tumori surrenalici/ovarici virilizzanti, gravidanza III trimestre",
+        warnings: "Stimola increzione 17-chetosteroidi. Valutazione medica necessaria"
+    },
+    {
+        name: "Sorbo",
+        latin: "Sorbus domestica",
+        categories: ["cardiovascolare"],
+        indications: "Varici, insufficienza venosa, arteriopatie, acufeni, vertigini",
+        properties: "Venotonico, vasocostrittore venoso, antitrombotico, protettore vascolare",
+        dosage: {
+            adults: "50-70 gocce MG 1D, 1-2 volte/die prima pasti. Prescrizione lunga per patologie recidivanti",
+            children: "Adattare all'età",
+            concentrated: "5-7 gocce 1-2 volte al giorno"
+        },
+        clinicalUse: [
+            "Varici, insufficienza venosa",
+            "Ulcere varicose arti inferiori",
+            "Emorroidi",
+            "Arteriopatie obliteranti",
+            "Gambe pesanti, edemi venosi",
+            "Acufeni, ronzii auricolari",
+            "Ipoacusia, otosclerosi",
+            "Vertigini con ronzii",
+            "Flebiti, tromboflebiti"
+        ],
+        synergies: [
+            "Aesculus hippocastanum: emorroidi, insufficienza venosa",
+            "Alnus glutinosa: tromboflebite",
+            "Castanea vesca: insufficienza venosa arti inferiori",
+            "Ilex aquifolium + Viburnum lantana: acufeni, otosclerosi",
+            "Castanea vesca + Juglans regia: ulcera varicosa"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Prescrizione lunga per patologie tendenzialmente recidivanti"
+    },
+    {
+        name: "Rovo",
+        latin: "Rubus fructicosus",
+        categories: ["articolare", "respiratorio"],
+        indications: "Artrosi senile, osteoporosi, enfisema, sclerosi tessuti, fibrosi",
+        properties: "Antifibrosclerotico, rimodellante tessutale, osteoblastico senile, antiartrosi co senile",
+        dosage: {
+            adults: "50-70 gocce MG 1D in unica somministrazione, oppure 30-50 gocce 2-3 volte/die",
+            children: "Adattare all'età",
+            concentrated: "5-7 gocce 1 volta/die o 3-5 gocce 2-3 volte/die"
+        },
+        clinicalUse: [
+            "Artrosi senile (dopo 60 anni)",
+            "Osteoporosi anziano",
+            "Osteoporosi post-menopausa",
+            "Enfisema polmonare",
+            "Bronchite cronica ostruttiva",
+            "Sclerosi parenchima polmonare",
+            "Fibromi uterini",
+            "Tendenze fibrosclerotiche utero, rene",
+            "Senescenza tessutale generalizzata"
+        ],
+        synergies: [
+            "Abies pectinata: osteopenia giovanile",
+            "Corylus avellana: bronchite cronica, enfisema, sclerosi polmonare",
+            "Pinus montana + Rosa canina: artrosi con osteoporosi",
+            "Sequoia gigantea + Vaccinium vitis idaea: osteoporosi anziano",
+            "Alnus incana + Vaccinium vitis idaea: fibroma uterino"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Indicato per patologie senili e degenerative"
+    },
+    {
+        name: "Salice Bianco",
+        latin: "Salix alba",
+        categories: ["articolare", "nervoso", "urogenitale"],
+        indications: "Artrosi dolorosa, febbre, cefalea, emicrania, dismenorrea, insonnia nervosa",
+        properties: "Antiflogistico, antipiretico, antalgico, sedativo, anafrodisiaco, regolatore ormonale",
+        dosage: {
+            adults: "Amenti 30-50 gocce per regolazione ormonale. Gemme 50-70 gocce/die. Scorza giovane ramo 50-70 gocce sera per artrosi dolorosa",
+            children: "Adattare all'età",
+            concentrated: "Ridurre a 1/10"
+        },
+        clinicalUse: [
+            "Artrosi dolorosa piccole articolazioni",
+            "Artralgie, artrite reumatoide",
+            "Cefalea, cefalea muscolo-tensiva, emicrania",
+            "Febbre, stati febbrili, influenza",
+            "Dismenorrea, amenorrea",
+            "Sindrome premestruale",
+            "Insonnia nervosa, eretismo sessuale",
+            "Lombalgia, gotta",
+            "Nevralgie reumatiche"
+        ],
+        synergies: [
+            "Rubus idaeus: amenorrea, dismenorrea",
+            "Tilia tomentosa: ansia, nervosismo, insonnia",
+            "Vaccinium vitis idaea: menopausa",
+            "Pinus montana + Vitis vinifera: artrosi, artralgie",
+            "Ampelopsis veitchii: periartrite"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Diverse preparazioni (amenti, gemme, scorza) per indicazioni specifiche"
+    },
+    {
+        name: "Acero Campestre",
+        latin: "Acer campestre",
+        categories: ["nervoso", "digestivo"],
+        indications: "Ansia, nevrosi, colecistopatie, diabete tipo 2, herpes, nevralgie",
+        properties: "Ansiolitico, coleretico, ipoglicemizzante, riequilibrante globuline, antivirale",
+        dosage: {
+            adults: "30-50 gocce MG 1D, 2-3 volte/die. Se associato: 50-70 gocce 1 volta/die. Non oltre 40 giorni consecutivi",
+            children: "15-30 gocce/die adattati all'età",
+            concentrated: "5-7 gocce 1-3 volte/die"
+        },
+        clinicalUse: [
+            "Nevrosi d'angoscia, attacchi panico",
+            "Nevrosi fobiche e ossessive",
+            "Colecistopatie, litiasi biliare",
+            "Diabete mellito tipo 2 (coadiuvante)",
+            "Herpes simplex, herpes zoster",
+            "Epatite C, AIDS (coadiuvante)",
+            "Nevralgie, paresi",
+            "Insufficienza immunitaria"
+        ],
+        synergies: [
+            "Fraxinus excelsior: litiasi biliare coledocica",
+            "Ginkgo biloba: morbo di Landry",
+            "Morus nigra: diabete tipo 2",
+            "Olea europaea: ipercolesterolemia + arteriosclerosi",
+            "Tilia tomentosa: nevrosi fobica, esiti paresi",
+            "Rosmarinus officinalis: discinesia biliare"
+        ],
+        contraindications: "Non prescrivere oltre 6 settimane consecutive",
+        warnings: "Prescrizione limitata ai dati biologici. Permette ad altri gemmoterapici di agire meglio"
+    },
+    {
+        name: "Castagno",
+        latin: "Castanea vesca",
+        categories: ["cardiovascolare"],
+        indications: "Insufficienza venosa, linfedema, varici, cellulite, stasi linfatica",
+        properties: "Linfotonico, drenante linfatico, venotonico, antiedemigeno",
+        dosage: {
+            adults: "50 gocce MG 1D, 2 volte/die",
+            children: "20-30 gocce/die",
+            concentrated: "5 gocce 2 volte/die"
+        },
+        clinicalUse: [
+            "Insufficienza venosa arti inferiori",
+            "Linfedema, edemi linfatici",
+            "Varici, varicosità",
+            "Cellulite edematosa",
+            "Stasi linfatica",
+            "Gambe pesanti",
+            "Ulcere varicose"
+        ],
+        synergies: [
+            "Sorbus domestica: insufficienza venosa, varici",
+            "Betula verrucosa linfa: cellulite, drenaggio",
+            "Ligustrum vulgare: linfedema",
+            "Vitis vinifera: stasi venosa"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Specifico per patologie linfovenose"
+    },
+    {
+        name: "Ontano Bianco",
+        latin: "Alnus incana",
+        categories: ["urogenitale", "cardiovascolare"],
+        indications: "Fibroma uterino, adenoma prostatico, trombosi, arteriti, cirrosi",
+        properties: "Antifibroma, antitrombotico potente, trofico cerebrovascolare, antinfiammatorio",
+        dosage: {
+            adults: "30-50 gocce MG 1D, 2 volte/die. Fibroma: 50 gocce 1-2 volte/die per 3 mesi, ripetere più volte nell'anno",
+            children: "Non indicato",
+            concentrated: "3-5 gocce 2 volte/die"
+        },
+        clinicalUse: [
+            "Fibroma uterino (riduce volume in 6-12 mesi)",
+            "Miomi uterini",
+            "Adenoma prostatico fase iniziale",
+            "Trombosi, stati trombotici gravi",
+            "Arteriti cerebrali",
+            "Cirrosi epatica",
+            "Morbo Alzheimer, Parkinson",
+            "Sclerosi multipla"
+        ],
+        synergies: [
+            "Rubus fructicosus + Vaccinium vitis idaea: fibroma uterino (cicli 3 mesi)",
+            "Sequoia gigantea: adenoma prostatico",
+            "Corylus avellana + Juniperus communis: cirrosi epatica",
+            "Betula pubescens: trombosi con biologia normale"
+        ],
+        contraindications: "Non in allattamento (riduce montata lattea - galattofugo)",
+        warnings: "Dosi 4-10 volte superiori per trombosi gravi sotto controllo medico"
+    },
+    {
+        name: "Ampelopsis (Vite Vergine)",
+        latin: "Ampelopsis veitchii",
+        categories: ["articolare"],
+        indications: "Artriti, tendiniti, sinoviti, periartriti, aderenze, Dupuytren",
+        properties: "Antinfiammatorio articolare potente, antifibrotico articolare, trofico sinovie",
+        dosage: {
+            adults: "30-50 gocce MG 1D, 2-3 volte/die prima pasti. Drenare prima con Betula verrucosa linfa. Se associato: 50-70 gocce 1 volta/die",
+            children: "Adattare età e peso",
+            concentrated: "3-5 gocce 2-3 volte/die"
+        },
+        clinicalUse: [
+            "Artriti, artrosi infiammatorie",
+            "Artrite reumatoide",
+            "Tendiniti, sinoviti",
+            "Periartriti scapolo-omerali",
+            "Morbo di Dupuytren",
+            "Aderenze post-infiammatorie",
+            "Fibroialinosi tessutale",
+            "Maculopatia essudativa",
+            "Edema essudativo retina"
+        ],
+        synergies: [
+            "Buxus sempervirens: Dupuytren, aderenze (alternare)",
+            "Ribes nigrum + Rosa canina: reumatismo iperalgico",
+            "Fraxinus excelsior: infiammazioni articolari",
+            "Betula verrucosa: tendiniti",
+            "Sequoia gigantea + Ribes nigrum + Tilia tomentosa: fibromialgie"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Drenare prima con Betula verrucosa linfa. Specifico per articolazioni, tendini, sinovie"
+    },
+    {
+        name: "Cornus Sanguinella",
+        latin: "Cornus sanguinea",
+        categories: ["cardiovascolare"],
+        indications: "Arteriti, coronariti, tromboflebiti, tiroide",
+        properties: "Anticoagulante, antitrombotico, trofico coronarie e arterie, antitiroideo",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 2-3 volte/die",
+            children: "Non specificato",
+            concentrated: "4-5 gocce 2-3 volte/die"
+        },
+        clinicalUse: [
+            "Arteriti, arteriopatie",
+            "Coronariti, angina pectoris",
+            "Tromboflebiti",
+            "Gozzo eutiroideo, adenoma tiroideo",
+            "Ipertiroidismo",
+            "Emorragie da anticoagulanti (con Carpinus)"
+        ],
+        synergies: [
+            "Alnus glutinosa: tromboflebiti, arteriopatie",
+            "Sorbus domestica: arteriti obliteranti",
+            "Rosa canina: gozzo eutiroideo",
+            "Carpinus betulus: emorragie da anticoagulanti"
+        ],
+        contraindications: "Cautela con anticoagulanti",
+        warnings: "Monitorare coagulazione"
+    },
+    {
+        name: "Nocciolo",
+        latin: "Corylus avellana",
+        categories: ["respiratorio", "digestivo"],
+        indications: "Enfisema, bronchite cronica, cirrosi, anemia, sclerosi polmonare",
+        properties: "Antifibrosclerotico polmonare ed epatico, antianemico, riparatore tessutale",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 2-3 volte/die",
+            children: "Adattare",
+            concentrated: "4-5 gocce 2-3 volte/die"
+        },
+        clinicalUse: [
+            "Enfisema polmonare",
+            "Bronchite cronica ostruttiva",
+            "Sclerosi parenchima polmonare",
+            "Cirrosi epatica",
+            "Anemia, anemie emolitiche",
+            "Epatosplenomegalia",
+            "Trombocitopenia"
+        ],
+        synergies: [
+            "Rubus fructicosus: bronchite cronica, enfisema, sclerosi polmonare",
+            "Carpinus betulus: bronchite cronica",
+            "Alnus incana + Juniperus communis: cirrosi epatica",
+            "Fagus sylvatica: bronchite ostruttiva enfisema"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Specifico per sclerosi tissutali polmonari ed epatiche"
+    },
+    {
+        name: "Ginepro",
+        latin: "Juniperus communis",
+        categories: ["digestivo", "urogenitale"],
+        indications: "Drenaggio renale, diabete, obesità, cellulite, insufficienza epatica",
+        properties: "Drenante renale, ipoglicemizzante, diuretico, depurativo, epatoprotettore",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 1-2 volte/die",
+            children: "20-30 gocce/die",
+            concentrated: "4-5 gocce 1-2 volte/die"
+        },
+        clinicalUse: [
+            "Drenaggio renale",
+            "Diabete tipo 2 (coadiuvante)",
+            "Obesità, sovrappeso",
+            "Cellulite",
+            "Insufficienza epatica lieve-media",
+            "Steatosi epatica",
+            "Ascite con epatomegalia",
+            "Cirrosi epatica"
+        ],
+        synergies: [
+            "Betula verrucosa linfa: drenaggio, cellulite",
+            "Alnus incana + Corylus avellana: cirrosi",
+            "Rosmarinus officinalis: insufficienza epatica, steatosi",
+            "Olea europaea: diabete, obesità"
+        ],
+        contraindications: "Non in gravidanza, nefropatie gravi",
+        warnings: "Aumentare idratazione"
+    },
+    {
+        name: "Olivo",
+        latin: "Olea europaea",
+        categories: ["cardiovascolare"],
+        indications: "Ipertensione, arteriosclerosi, diabete, ipercolesterolemia",
+        properties: "Ipotensivo, ipoglicemizzante, ipocolesterolemizzante, antiateromatoso",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 1-2 volte/die",
+            children: "Adattare",
+            concentrated: "4-5 gocce 1-2 volte/die"
+        },
+        clinicalUse: [
+            "Ipertensione arteriosa",
+            "Arteriosclerosi",
+            "Ipercolesterolemia",
+            "Diabete tipo 2",
+            "Obesità",
+            "Sindrome metabolica"
+        ],
+        synergies: [
+            "Crataegus + Tilia tomentosa: ipertensione",
+            "Viscum album: ipertensione, sclerosi",
+            "Acer campestre: ipercolesterolemia + arteriosclerosi",
+            "Morus nigra: diabete",
+            "Ginkgo biloba: arteriosclerosi cerebrale"
+        ],
+        contraindications: "Monitorare se in terapia antipertensiva",
+        warnings: "Può potenziare farmaci antipertensivi"
+    },
+    {
+        name: "Ginkgo",
+        latin: "Ginkgo biloba",
+        categories: ["cardiovascolare", "nervoso"],
+        indications: "Deficit cerebrali, vertigini, acufeni, arteriopatie, memoria",
+        properties: "Vasodilatatore cerebrale, antiossidante, neuroprotettore, antitrombotico",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 2 volte/die",
+            children: "Non prima 12 anni",
+            concentrated: "4-5 gocce 2 volte/die"
+        },
+        clinicalUse: [
+            "Deficit cerebrali vascolari anziano",
+            "Arteriosclerosi cerebrale",
+            "TIA, RIND",
+            "Vertigini, sindrome Ménière",
+            "Acufeni",
+            "Turbe memoria",
+            "Arteriopatie arti inferiori"
+        ],
+        synergies: [
+            "Alnus glutinosa + Olea europaea: deficit cerebrali",
+            "Buddleja davidii: vertigini",
+            "Acer campestre: morbo Landry",
+            "Crataegus: insufficienza circolatoria"
+        ],
+        contraindications: "Cautela con anticoagulanti",
+        warnings: "Monitorare coagulazione"
+    },
+    {
+        name: "Mirtillo Nero",
+        latin: "Vaccinium myrtillus",
+        categories: ["cardiovascolare", "digestivo"],
+        indications: "Retinopatia, fragilità capillare, diarrea, colite, vista",
+        properties: "Vasoprotettore microcircolo, antiossidante retinico, astringente intestinale",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 2 volte/die",
+            children: "20-30 gocce/die",
+            concentrated: "4-5 gocce 2 volte/die"
+        },
+        clinicalUse: [
+            "Retinopatia diabetica",
+            "Fragilità capillare",
+            "Disturbi visione notturna",
+            "Maculopatia",
+            "Diarrea, colite",
+            "Emorroidi",
+            "Ulcera peptica"
+        ],
+        synergies: [
+            "Buddleja davidii: nictalopia, cataratta",
+            "Ficus carica + Alnus glutinosa: ulcera",
+            "Vaccinium vitis idaea: colite"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Sicuro anche per uso prolungato"
+    },
+    {
+        name: "Viburno Lantana",
+        latin: "Viburnum lantana",
+        categories: ["respiratorio"],
+        indications: "Asma spasmodica, allergie respiratorie, eczema",
+        properties: "Antispasmodico bronchiale, antiallergico, sedativo respiratorio",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 2-3 volte/die",
+            children: "15-30 gocce/die",
+            concentrated: "4-5 gocce 2-3 volte/die"
+        },
+        clinicalUse: [
+            "Asma allergica spasmodica",
+            "Allergie respiratorie",
+            "Bronchiti spasmodiche",
+            "Dispnea asmatica",
+            "Eczema atopico"
+        ],
+        synergies: [
+            "Ribes nigrum: asma, allergie",
+            "Alnus glutinosa: asma allergica",
+            "Crataegus: asma cardiaca"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Specifico per componente spasmodica"
+    },
+    {
+        name: "Rosmarino",
+        latin: "Rosmarinus officinalis",
+        categories: ["digestivo"],
+        indications: "Insufficienza epatica, colecisti, colesterolo, steatosi, cirrosi",
+        properties: "Coleretico, colagogo, epatoprotettore, rigenerante epatico, detossificante",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 1-2 volte/die",
+            children: "Adattare",
+            concentrated: "4-5 gocce 1-2 volte/die"
+        },
+        clinicalUse: [
+            "Insufficienza epatica",
+            "Steatosi epatica",
+            "Cirrosi epatica",
+            "Colecistopatie",
+            "Ipercolesterolemia",
+            "Discinesia biliare",
+            "Epatiti croniche"
+        ],
+        synergies: [
+            "Juniperus communis: insufficienza epatica, steatosi, cirrosi",
+            "Acer campestre: discinesia biliare",
+            "Secale cereale: cirrosi, epatopatie gravi",
+            "Juglans regia: insufficienza pancreatico-epatica"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Potente epatoprotettore e rigenerante"
+    },
+    {
+        name: "Vischio",
+        latin: "Viscum album",
+        categories: ["cardiovascolare", "nervoso"],
+        indications: "Ipertensione, vertigini, epilessia, sciatica, tumori (coadiuvante)",
+        properties: "Ipotensivo, antispasmodico, antitumorale (coadiuvante), regolatore neurovegetativo",
+        dosage: {
+            adults: "30-40 gocce MG 1D o 1CH, 2 volte/die. La 1CH (1:100) rende più sicuro l'uso. Aumentare a 50-60 gocce se 1 volta/die associato",
+            children: "Valutazione medica necessaria",
+            concentrated: "3-6 gocce invece di 30-60 gocce"
+        },
+        clinicalUse: [
+            "Ipertensione arteriosa",
+            "Arteriosclerosi",
+            "Vertigini, sindrome Ménière",
+            "Epilessia piccolo male",
+            "Sciatica",
+            "Lombalgia irradiata",
+            "Tumori (solo coadiuvante)",
+            "Fibromialgie",
+            "Sindrome gambe senza riposo"
+        ],
+        synergies: [
+            "Olea europaea: ipertensione",
+            "Crataegus: ipertensione, cardiopatie",
+            "Tilia tomentosa: epilessia piccolo male, ipereccitabilità",
+            "Sorbus domestica: acufeni, vertigini",
+            "Alnus glutinosa: vasculopatie cerebrali"
+        ],
+        contraindications: "Non in gravidanza, allattamento. Uso orale limitato (preferire iniettabili per tumori)",
+        warnings: "Azione utero-tonica. Valutazione medica. Diluizione 1CH più sicura. Tossicità possibile a dosi eccessive"
+    },
+    {
+        name: "Quercia",
+        latin: "Quercus pedunculata",
+        categories: ["nervoso"],
+        indications: "Astenie, surrenali, andropausa, convalescenza",
+        properties: "Tonico generale, stimolante surrenalico, androgeno-like",
+        dosage: {
+            adults: "40-50 gocce MG 1D, 1-2 volte/die",
+            children: "20-30 gocce/die",
+            concentrated: "4-5 gocce 1-2 volte/die"
+        },
+        clinicalUse: [
+            "Astenie, stanchezza",
+            "Insufficienza surrenalica",
+            "Andropausa",
+            "Convalescenza",
+            "Ipotensione"
+        ],
+        synergies: [
+            "Ribes nigrum: iposurrenalismo",
+            "Sequoia gigantea: andropausa",
+            "Betula pubescens: astenie"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Tonico potente"
+    }
+,
+
+    {
+        name: "Ippocastano",
+        latin: "Aesculus hippocastanum",
+        categories: ["cardiovascolare"],
+        indications: "Emorroidi, varici, insufficienza venosa, edemi, cellulite, prostatismo",
+        properties: "Flebotonico, antiedemigeno, vasoprotettore, decongestionante venoso",
+        dosage: {
+            adults: "50-150 gocce MG 1D al giorno in 2-3 somministrazioni. Se associato: 50-70 gocce",
+            children: "Adattare a età e peso",
+            concentrated: "5 gocce 1-3 volte/die"
+        },
+        clinicalUse: [
+            "Emorroidi, noduli emorroidali",
+            "Varici iniziali, varicosità",
+            "Insufficienza venosa arti inferiori",
+            "Edemi post-traumatici e post-operatori",
+            "Cellulite",
+            "Stasi venosa pelvica e prostatica",
+            "Varicocele",
+            "Varici vulvari e uterine",
+            "Enfisema polmonare (con Corylus)",
+            "Tromboflebiti (con Alnus glutinosa)"
+        ],
+        synergies: [
+            "Sorbus domestica: stasi linfatica e venosa, emorroidi",
+            "Castanea vesca: patologia varicosa (suo complementare)",
+            "Citrus limonum: iperfibrinogenemia, prevenzione trombi",
+            "Betula verrucosa linfa + Fraxinus excelsior: cellulite",
+            "Tilia tomentosa: crampi muscolari notturni"
+        ],
+        contraindications: "Non evidenziate. Può essere prescritto anche in gravidanza se necessario",
+        warnings: "Biologicamente attivo quando corteccia surrenale è integra - associare Ribes nigrum se necessario"
+    },
+    {
+        name: "Pioppo Nero",
+        latin: "Populus nigra",
+        categories: ["cardiovascolare", "articolare"],
+        indications: "Arteriti arti inferiori, artrosi, gotta, bronchiti, tracheiti, ulcere",
+        properties: "Antiartrosico, antiarteriosclerotico, ipocoagulante, cicatrizzante, balsamico",
+        dosage: {
+            adults: "50 gocce MG 1D 2 volte/die, o 70 gocce 1 volta/die se associato",
+            children: "Adattare",
+            concentrated: "5-7 gocce 2 volte/die o 1 volta/die"
+        },
+        clinicalUse: [
+            "Arteriti arti inferiori",
+            "Arterosclerosi",
+            "Artrosi iperuricemia",
+            "Gotta, artropatia gottosa",
+            "Bronchiti croniche",
+            "Tracheiti ricorrenti",
+            "Ulcere atone da insufficienza arteriosa",
+            "Cistiti recidivanti"
+        ],
+        synergies: [
+            "Alnus glutinosa: insufficienza arteriosa, complementare",
+            "Ampelopsis + Ribes nigrum: reumatismo infiammatorio",
+            "Cercis siliquastrum + Cornus: arteriopatie trombotiche",
+            "Fraxinus excelsior + Juniperus + Ulmus: gotta"
+        ],
+        contraindications: "Non somministrare per lunghi periodi a epatopatici",
+        warnings: "Può aumentare a2-globuline se uso incongruo. Controllare elettroforesi proteine. Non oltre 6 settimane per azione ipocoagulante"
+    },
+    {
+        name: "Mandorlo",
+        latin: "Prunus amygdalus",
+        categories: ["cardiovascolare", "nervoso"],
+        indications: "Arteriosclerosi, nevrosi, fobie, sclerosi vascolare, diabete",
+        properties: "Antiaterosclerotico, vasoprotettore, ansiolitico, ipoglicemizzante, ipocolesterolemizzante",
+        dosage: {
+            adults: "30-50 gocce MG 1D 2-3 volte/die. Se associato: 50-70 gocce 1 volta/die",
+            children: "Adattare",
+            concentrated: "3-5-7 gocce 2-3 volte/die o 1 volta"
+        },
+        clinicalUse: [
+            "Arteriosclerosi generalizzata",
+            "Sclerosi coronarica, aortica",
+            "Cardiopatia ischemica",
+            "Ipertensione arteriosa",
+            "Nevrosi fobiche (agorafobia, claustrofobia)",
+            "Nevrosi ossessive",
+            "Diabete tipo II",
+            "Deficit cerebrali anziano",
+            "Gangrena diabetica"
+        ],
+        synergies: [
+            "Crataegus + Syringa: sclerosi coronarica, angina",
+            "Olea + Viscum + Crataegus: ipertensione",
+            "Acer campestre + Olea: ipercolesterolemia",
+            "Ginkgo + Larix: arteriopatia diabetica",
+            "Tilia + Ficus: nevrosi ossessiva"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Utile uso prolungato in cardiopatie ischemiche"
+    },
+    {
+        name: "Platano Orientale",
+        latin: "Platanus orientalis",
+        categories: ["digestivo", "urogenitale"],
+        indications: "Splenomegalia, leucocitosi, prostata, psoriasi, acne, eczema, cataratta",
+        properties: "Iperplasia reticolo-endoteliale, immunomodulante, antiprostatico (semi)",
+        dosage: {
+            adults: "30-50 gocce MG 1D 2 volte/die. Se associato: 50-70 gocce 1 volta",
+            children: "Adattare",
+            concentrated: "3-5-7 gocce"
+        },
+        clinicalUse: [
+            "Iperplasia reticolo-endoteliale",
+            "Splenomegalia",
+            "Leucocitosi (con Vitis)",
+            "Adenoma prostatico (semi)",
+            "Ipertrofia prostatica (semi)",
+            "Psoriasi (gemme con Cedrus, Secale)",
+            "Acne rosacea, acne pustolosa",
+            "Eczema, dermatosi",
+            "Cataratta (con Betula pubescens)"
+        ],
+        synergies: [
+            "Tamarix gallica: ipertrofia milza",
+            "Sequoia gigantea (semi): ipertrofia prostatica",
+            "Cedrus + Secale: psoriasi",
+            "Ribes + Ulmus: acne recidivante",
+            "Ficus carica: granuloma eosinofilo"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Associazione clinica, no fitosociologica (albero introdotto)"
+    },
+    {
+        name: "Larice",
+        latin: "Larix decidua",
+        categories: ["articolare", "cardiovascolare"],
+        indications: "Osteoporosi, fragilità ossea, arteriosclerosi, fragilità capillare",
+        properties: "Osteoblastico, rimineralizzante, vasoprotettore, angioprotettore",
+        dosage: {
+            adults: "40-50 gocce MG 1D 2 volte/die",
+            children: "20-30 gocce/die",
+            concentrated: "4-5 gocce 2 volte/die"
+        },
+        clinicalUse: [
+            "Osteoporosi senile",
+            "Fragilità ossea",
+            "Demineralizzazione",
+            "Fragilità capillare",
+            "Arteriosclerosi",
+            "Microangiopatia diabetica",
+            "Arteriopatia diabetica",
+            "Sclerosi aortica",
+            "Retinopatia diabetica"
+        ],
+        synergies: [
+            "Abies pectinata: osteoporosi, decalcificazione",
+            "Aesculus: fragilità capillare",
+            "Ginkgo + Olea: arteriopatia diabetica",
+            "Vaccinium myrtillus: retinopatia",
+            "Malus: lesioni endotelio vascolare"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Rimineralizzante specifico età avanzata"
+    },
+    {
+        name: "Ulmo Campestre",
+        latin: "Ulmus campestris",
+        categories: ["digestivo"],
+        indications: "Acne, eczema, herpes, dermatiti suppurative, gotta, diarrea",
+        properties: "Drenante cutaneo, cicatrizzante, assorbente essudati, antidiarroico",
+        dosage: {
+            adults: "40-50 gocce MG 1D 2 volte/die",
+            children: "20-30 gocce/die",
+            concentrated: "4-5 gocce 2 volte/die"
+        },
+        clinicalUse: [
+            "Acne, acne suppurativa",
+            "Eczema essudativo",
+            "Herpes simplex, herpes zoster",
+            "Dermatiti seborroiche",
+            "Impetigine, piodermiti",
+            "Gotta (con Fraxinus, Populus)",
+            "Diarree croniche",
+            "Psoriasi (con Cedrus)"
+        ],
+        synergies: [
+            "Cedrus libani: dermatiti, psoriasi, eczema",
+            "Juglans regia: eczema infetto, impetigine",
+            "Rosa canina + Acer campestre: herpes",
+            "Fraxinus + Populus: gotta",
+            "Platanus + Ribes: acne pustolosa"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Drenante specifico cute e dermatosi"
+    },
+    {
+        name: "Fagot",
+        latin: "Fagus sylvatica",
+        categories: ["digestivo"],
+        indications: "Insufficienza renale, obesità, anemia, ipogammaglobulinemia",
+        properties: "Drenante renale, riequilibrante immunità, antianemico, dimagrante",
+        dosage: {
+            adults: "40-50 gocce MG 1D 2 volte/die",
+            children: "20-30 gocce/die",
+            concentrated: "4-5 gocce 2 volte/die"
+        },
+        clinicalUse: [
+            "Insufficienza renale lieve",
+            "Obesità, sovrappeso",
+            "Ipogammaglobulinemia post-infettiva",
+            "Anemia",
+            "Nefrite interstiziale cronica",
+            "Glomerulonefrite (con Betula, Ribes)"
+        ],
+        synergies: [
+            "Betula verrucosa linfa: obesità, cellulite",
+            "Corylus amenti: adiposità",
+            "Rosa canina: ipogammaglobulinemia infantile",
+            "Ribes + Betula: glomerulonefrite acuta"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Drenante renale specifico"
+    },
+    {
+        name: "Citrus Limone (scorza ramo)",
+        latin: "Citrus limonum",
+        categories: ["cardiovascolare"],
+        indications: "Trombofilia, iperfibrinogenemia, iperviscosità ematica, varici rischio trombotico",
+        properties: "Anticoagulante, ipofibrinogenizzante, fluidificante sangue, vasoprotettore",
+        dosage: {
+            adults: "50-70 gocce MG 1D 1 volta/die, preferibilmente sera",
+            children: "Non specificato",
+            concentrated: "5-7 gocce sera"
+        },
+        clinicalUse: [
+            "Trombofilia, stati ipercoagulabili",
+            "Iperfibrinogenemia",
+            "Iperviscosità ematica",
+            "Varici con rischio trombotico",
+            "Prevenzione trombosi venosa",
+            "Ateromatosi carotidea",
+            "Edemi declivi da terapia ormonale"
+        ],
+        synergies: [
+            "Aesculus + Populus: tromboflebite",
+            "Sorbus + Castanea: insufficienza venosa con iperviscosità",
+            "Alnus glutinosa: deficit cerebrali con trombofilia",
+            "Acer campestre: litiasi biliare"
+        ],
+        contraindications: "Cautela con anticoagulanti",
+        warnings: "Monitorare coagulazione. Prescrizione riservata al medico"
+    },
+    {
+        name: "Calluna (Brugo)",
+        latin: "Calluna vulgaris",
+        categories: ["urogenitale"],
+        indications: "Cistiti, prostatiti, infezioni urinarie, litiasi renale",
+        properties: "Antisettico urinario, diuretico, antilitiasico, antinfiammatorio urinario",
+        dosage: {
+            adults: "40-50 gocce MG 1D 2 volte/die",
+            children: "20-30 gocce/die",
+            concentrated: "4-5 gocce 2 volte/die"
+        },
+        clinicalUse: [
+            "Cistiti acute e croniche",
+            "Cistiti recidivanti",
+            "Prostatiti croniche",
+            "Colibacillosi urinarie",
+            "Litiasi renale urica",
+            "Uretriti",
+            "Pieliti"
+        ],
+        synergies: [
+            "Vaccinium vitis idaea: cistiti recidivanti",
+            "Ribes nigrum: prostatite cronica",
+            "Sequoia + Juniperus: prostatiti",
+            "Populus nigra: cistiti, uretriti"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Antisettico specifico vie urinarie"
+    },
+    {
+        name: "Ligustro",
+        latin: "Ligustrum vulgare",
+        categories: ["cardiovascolare"],
+        indications: "Coronaropatie, angina, ipertensione, vertigini, acufeni",
+        properties: "Vasodilatatore coronarico, cardioprotettore, ipotensivo, trofico orecchio interno",
+        dosage: {
+            adults: "40-50 gocce MG 1D 2 volte/die",
+            children: "Non specificato",
+            concentrated: "4-5 gocce 2 volte/die"
+        },
+        clinicalUse: [
+            "Angina pectoris",
+            "Coronaropatie",
+            "Ipertensione arteriosa",
+            "Vertigini, sindrome Ménière",
+            "Acufeni, ronzii auricolari",
+            "Insufficienza coronarica"
+        ],
+        synergies: [
+            "Crataegus + Cornus: coronaropatie",
+            "Olea + Viscum: ipertensione",
+            "Ginkgo biloba: vertigini",
+            "Sorbus + Ilex: acufeni"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Specifico per coronarie e orecchio interno"
+    },
+    {
+        name: "Morus Gelso Nero",
+        latin: "Morus nigra",
+        categories: ["digestivo"],
+        indications: "Diabete tipo 2, iperglicemia, pancreatiti, dislipidemia",
+        properties: "Ipoglicemizzante, pancreatico, ipocolesterolemizzante, antiaterosclerotico",
+        dosage: {
+            adults: "40-50 gocce MG 1D 2-3 volte/die prima pasti",
+            children: "Adattare",
+            concentrated: "4-5 gocce 2-3 volte/die"
+        },
+        clinicalUse: [
+            "Diabete mellito tipo 2",
+            "Iperglicemia, intolleranza glucidica",
+            "Pancreatite cronica",
+            "Insufficienza pancreatica",
+            "Ipercolesterolemia",
+            "Dislipidemia diabetica"
+        ],
+        synergies: [
+            "Juglans regia: pancreatiti, diabete",
+            "Acer campestre: diabete tipo 2",
+            "Olea europaea: sindrome metabolica",
+            "Vaccinium myrtillus: retinopatia diabetica"
+        ],
+        contraindications: "Monitorare glicemia se in terapia",
+        warnings: "Può potenziare ipoglicemizzanti"
+    },
+    {
+        name: "Zizyphus (Giuggiolo)",
+        latin: "Zizyphus jujuba",
+        categories: ["nervoso"],
+        indications: "Insonnia grave, ansia importante, palpitazioni, irritabilità",
+        properties: "Sedativo potente, ansiolitico, ipnoinduttore, cardiosedativo",
+        dosage: {
+            adults: "50-100 gocce MG 1D alla sera. 40-50 gocce 2 volte/die per ansia",
+            children: "20-40 gocce sera",
+            concentrated: "5-10 gocce sera, 4-5 gocce giorno"
+        },
+        clinicalUse: [
+            "Insonnia grave, ribelle",
+            "Ansia severa, attacchi panico",
+            "Palpitazioni ansiose",
+            "Irritabilità, nervosismo",
+            "Svezzamento da benzodiazepine",
+            "Depressione ansiosa"
+        ],
+        synergies: [
+            "Tilia tomentosa: insonnia, ansia (potenziamento)",
+            "Ficus carica: ansia con gastrite",
+            "Crataegus: palpitazioni"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Sedativo più potente di Tilia. Cautela se guida"
+    },
+    {
+        name: "Tamarix (Tamerice)",
+        latin: "Tamarix gallica",
+        categories: ["digestivo"],
+        indications: "Splenomegalia, anemia, coliche lattante, ferropenia",
+        properties: "Antisplenomegalico, antianemico, antispasmodico infantile, stimolante emopoiesi",
+        dosage: {
+            adults: "40-50 gocce MG 1D 2 volte/die",
+            children: "10-20 gocce 1-2 volte/die, particolarmente indicato in pediatria",
+            concentrated: "4-5 gocce adulti, 1-2 gocce bambini"
+        },
+        clinicalUse: [
+            "Splenomegalia",
+            "Anemia, ferropenia",
+            "Coliche intestinali lattante",
+            "Piastrinopenie",
+            "Leucopenie",
+            "Malaria (coadiuvante postumi)"
+        ],
+        synergies: [
+            "Tilia tomentosa: coliche lattante",
+            "Platanus: splenomegalia",
+            "Rosa canina: anemia bambini"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Particolarmente indicato in pediatria"
+    },
+    {
+        name: "Avena",
+        latin: "Avena sativa",
+        categories: ["nervoso"],
+        indications: "Astenia nervosa, esaurimento, insonnia, convalescenza, tabagismo",
+        properties: "Tonico nervoso, ricostituente, sedativo, disassuefazione nicotina",
+        dosage: {
+            adults: "40-50 gocce MG 1D 2-3 volte/die",
+            children: "20-30 gocce/die",
+            concentrated: "4-5 gocce 2-3 volte/die"
+        },
+        clinicalUse: [
+            "Astenia nervosa, esaurimento",
+            "Convalescenza prolungata",
+            "Insonnia da surmenage",
+            "Tabagismo, dipendenza nicotina",
+            "Depressione reattiva",
+            "Stress cronico"
+        ],
+        synergies: [
+            "Tilia tomentosa: stress, insonnia",
+            "Betula verrucosa: astenie",
+            "Ficus carica: stress psicosomatico"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Tonico e sedativo insieme"
+    },
+    {
+        name: "Buxus (Bosso)",
+        latin: "Buxus sempervirens",
+        categories: ["digestivo", "articolare"],
+        indications: "Dupuytren, aderenze, sclerodermia, reumatismi, insufficienza epatica",
+        properties: "Antifibrotico, drenante epatico, antireumatico, protettore epatico",
+        dosage: {
+            adults: "30-50 gocce MG 1D 2 volte/die. Alternare con Ampelopsis per Dupuytren",
+            children: "Non raccomandato sotto 12 anni",
+            concentrated: "3-5 gocce 2 volte/die"
+        },
+        clinicalUse: [
+            "Morbo di Dupuytren",
+            "Aderenze post-operatorie",
+            "Sclerodermia",
+            "Fibrosi tessutali",
+            "Insufficienza epatica",
+            "Reumatismi cronici"
+        ],
+        synergies: [
+            "Ampelopsis veitchii: Dupuytren (alternare)",
+            "Juniperus + Rosmarinus: insufficienza epatica",
+            "Rubus fructicosus: candidosi orale"
+        ],
+        contraindications: "Non in gravidanza, allattamento, infanzia",
+        warnings: "Uso riservato casi specifici. Prescrizione medica"
+    },
+    {
+        name: "Cedrus (Cedro Libano)",
+        latin: "Cedrus libani",
+        categories: ["digestivo"],
+        indications: "Eczema secco, psoriasi, dermatiti squamose, seborrea",
+        properties: "Drenante cutaneo, cheratolitico, antiseborroico, cicatrizzante",
+        dosage: {
+            adults: "40-50 gocce MG 1D 2 volte/die",
+            children: "Adattare",
+            concentrated: "4-5 gocce 2 volte/die"
+        },
+        clinicalUse: [
+            "Eczema secco, cheratosico",
+            "Psoriasi (con Platanus, Secale)",
+            "Dermatite seborroica",
+            "Ittiosi, cheratosi",
+            "Crosta lattea",
+            "Seborrea capillizio"
+        ],
+        synergies: [
+            "Platanus + Secale: psoriasi",
+            "Ulmus campestris: dermatiti",
+            "Juglans regia: eczema infetto",
+            "Buddleja davidii: cheratosi attinica"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Specifico per dermatosi secche e squamose"
+    },
+    {
+        name: "Cercis (Albero Giuda)",
+        latin: "Cercis siliquastrum",
+        categories: ["cardiovascolare"],
+        indications: "Arteriopatie arti, trombosi, gangrena, insufficienza arteriosa",
+        properties: "Anticoagulante potente, antitrombotico, vasodilatatore arterioso",
+        dosage: {
+            adults: "30-40 gocce MG 1D 2 volte/die",
+            children: "Non raccomandato",
+            concentrated: "3-4 gocce 2 volte/die"
+        },
+        clinicalUse: [
+            "Arteriopatie obliteranti arti",
+            "Gangrena diabetica",
+            "Trombosi arteriose",
+            "Insufficienza arteriosa periferica",
+            "Claudicatio intermittens"
+        ],
+        synergies: [
+            "Populus nigra + Cornus: arteriopatie trombotiche",
+            "Morus nigra: gangrena diabetica",
+            "Ginkgo biloba: arteriopatie"
+        ],
+        contraindications: "Cautela con anticoagulanti",
+        warnings: "Anticoagulante potente. Monitorare coagulazione"
+    },
+    {
+        name: "Secale (Segale)",
+        latin: "Secale cereale",
+        categories: ["digestivo"],
+        indications: "Cirrosi epatica, epatopatie gravi, psoriasi, insufficienza epatica severa",
+        properties: "Epatoprotettore potente, rigenerante epatico, citoprotettore",
+        dosage: {
+            adults: "40-50 gocce MG 1D 2 volte/die",
+            children: "Non specificato",
+            concentrated: "4-5 gocce 2 volte/die"
+        },
+        clinicalUse: [
+            "Cirrosi epatica",
+            "Insufficienza epatica grave",
+            "Epatiti croniche",
+            "Psoriasi (con Cedrus, Platanus)",
+            "Intossicazioni epatiche"
+        ],
+        synergies: [
+            "Juniperus + Rosmarinus: cirrosi",
+            "Cedrus + Platanus: psoriasi",
+            "Alnus incana + Corylus: cirrosi avanzata"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Riservato epatopatie gravi. Prescrizione medica"
+    },
+    {
+        name: "Syringa (Lilla)",
+        latin: "Syringa vulgaris",
+        categories: ["cardiovascolare"],
+        indications: "Angina pectoris, coronaropatie, ipertensione, arteriosclerosi coronarica",
+        properties: "Vasodilatatore coronarico, antianginoso, ipotensivo, cardioprotettore",
+        dosage: {
+            adults: "40-50 gocce MG 1D 2 volte/die",
+            children: "Non specificato",
+            concentrated: "4-5 gocce 2 volte/die"
+        },
+        clinicalUse: [
+            "Angina pectoris",
+            "Sclerosi coronarica",
+            "Cardiopatia ischemica",
+            "Ipertensione arteriosa",
+            "Prevenzione infarto"
+        ],
+        synergies: [
+            "Crataegus + Prunus amygdalus: angina, sclerosi coronarica",
+            "Cornus sanguinea: coronaropatie",
+            "Olea europaea: ipertensione"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Specifico per coronarie"
+    },
+    {
+        name: "Zea Mais",
+        latin: "Zea mays",
+        categories: ["cardiovascolare"],
+        indications: "Post-infarto, cicatrizzazione miocardio, insufficienza cardiaca, arterosclerosi",
+        properties: "Cicatrizzante cardiaco, cardioprotettore, rigenerante miocardio",
+        dosage: {
+            adults: "40-50 gocce MG 1D 2 volte/die",
+            children: "Non specificato",
+            concentrated: "4-5 gocce 2 volte/die"
+        },
+        clinicalUse: [
+            "Post-infarto miocardico",
+            "Sequele infarto",
+            "Cicatrizzazione miocardio",
+            "Insufficienza cardiaca post-ischemica",
+            "Cardiopatia ischemica"
+        ],
+        synergies: [
+            "Hippophae rhamnoides: post-infarto, cicatrizzazione",
+            "Crataegus: insufficienza cardiaca",
+            "Prunus amygdalus: arteriosclerosi"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Importante nella convalescenza post-infartuale"
+    },
+    {
+        name: "Buddleja",
+        latin: "Buddleja davidii",
+        categories: ["cardiovascolare"],
+        indications: "Vertigini, deficit visivi, cataratta, cheratosi, sindrome Ménière",
+        properties: "Trofico oculare, antidegenerativo oculare, antivertiginoso, vasoprotettore",
+        dosage: {
+            adults: "30-50 gocce MG 1D (boccioli) 2 volte/die, o 50-70 gocce 1 volta/die se associato",
+            children: "Adattare",
+            concentrated: "3-5-7 gocce"
+        },
+        clinicalUse: [
+            "Vertigini, sindrome Ménière",
+            "Cataratta iniziale",
+            "Miodesopsie",
+            "Astenopia, affaticamento visivo",
+            "Cheratosi attinica",
+            "Processi degenerativi oculari"
+        ],
+        synergies: [
+            "Ginkgo biloba: vertigini",
+            "Tilia tomentosa: ansia con vertigini",
+            "Vaccinium myrtillus: nictalopia",
+            "Ribes + Vaccinium myrtillus: esiti distacco retinico",
+            "Cedrus libani: cheratosi attinica"
+        ],
+        contraindications: "Non evidenziate",
+        warnings: "Specifico per occhio e vertigini"
+    }
+];
+
+        let currentCategory = 'all';
+        let searchTerm = '';
+
+        function updateStats() {
+            const total = gemmoData.length;
+            document.getElementById('stats').textContent = `${total} gemmoderivati disponibili`;
+        }
+
+        function renderResults() {
+            const filtered = gemmoData.filter(gem => {
+                const matchCategory = currentCategory === 'all' || gem.categories.includes(currentCategory);
+                const matchSearch = !searchTerm || 
+                    gem.name.toLowerCase().includes(searchTerm) ||
+                    gem.latin.toLowerCase().includes(searchTerm) ||
+                    gem.indications.toLowerCase().includes(searchTerm) ||
+                    gem.clinicalUse.some(use => use.toLowerCase().includes(searchTerm));
+                return matchCategory && matchSearch;
+            });
+
+            const resultsDiv = document.getElementById('results');
+            
+            if (filtered.length === 0) {
+                resultsDiv.innerHTML = '<div class="no-results">Nessun risultato trovato per la ricerca corrente</div>';
+                return;
+            }
+
+            resultsDiv.innerHTML = filtered.map(gem => `
+                <div class="gem-card" onclick="showDetail('${gem.latin.replace(/'/g, "\\'")}')">
+                    <div class="gem-name">${gem.name}</div>
+                    <div class="gem-latin">${gem.latin}</div>
+                    <div class="gem-indications">${gem.indications}</div>
+                </div>
+            `).join('');
+        }
+
+        function showDetail(latinName) {
+            const gem = gemmoData.find(g => g.latin === latinName);
+            if (!gem) return;
+
+            document.getElementById('detailName').textContent = gem.name;
+            document.getElementById('detailLatin').textContent = gem.latin;
+            
+            const content = `
+                <div class="section">
+                    <div class="section-title">Proprietà Principali</div>
+                    <div class="section-content">${gem.properties}</div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Posologia e Dosaggi</div>
+                    <div class="dosage-box">
+                        <div class="dosage-label">Adulti (MG 1D):</div>
+                        ${gem.dosage.adults}
+                    </div>
+                    ${gem.dosage.children ? `
+                    <div class="dosage-box">
+                        <div class="dosage-label">Bambini/Adolescenti:</div>
+                        ${gem.dosage.children}
+                    </div>
+                    ` : ''}
+                    <div class="dosage-box">
+                        <div class="dosage-label">Concentrato (non diluito):</div>
+                        ${gem.dosage.concentrated}
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Indicazioni Cliniche</div>
+                    <ul>
+                        ${gem.clinicalUse.map(use => `<li>${use}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Associazioni Sinergiche</div>
+                    ${gem.synergies.map(syn => `<div class="synergy-item">${syn}</div>`).join('')}
+                </div>
+
+                ${gem.contraindications ? `
+                <div class="section">
+                    <div class="section-title">Controindicazioni</div>
+                    <div class="warning-box">${gem.contraindications}</div>
+                </div>
+                ` : ''}
+
+                ${gem.warnings ? `
+                <div class="section">
+                    <div class="section-title">Avvertenze</div>
+                    <div class="section-content">${gem.warnings}</div>
+                </div>
+                ` : ''}
+            `;
+
+            document.getElementById('detailContent').innerHTML = content;
+            document.getElementById('detailView').style.display = 'block';
+        }
+
+        function closeDetail() {
+            document.getElementById('detailView').style.display = 'none';
+        }
+
+        // Event listeners
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentCategory = this.dataset.category;
+                renderResults();
+            });
+        });
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            searchTerm = e.target.value.toLowerCase();
+            renderResults();
+        });
+
+        // Initial render
+        updateStats();
+        renderResults();
+    </script>
+</body>
+</html>
