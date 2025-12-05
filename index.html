@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Gemmoterapia Clinica - 44 Rimedi Completi</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container { max-width: 100%; background: white; min-height: 100vh; }
+        header {
+            background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%);
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        h1 { font-size: 22px; margin-bottom: 6px; font-weight: 700; }
+        .subtitle { font-size: 12px; opacity: 0.95; }
+        .search-container {
+            padding: 15px;
+            background: #f8f9fa;
+            position: sticky;
+            top: 78px;
+            z-index: 100;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: white;
+        }
+        #searchInput:focus { outline: none; border-color: #4CAF50; }
+        .search-icon {
+            position: absolute;
+            right: 30px;
+            top: 27px;
+            font-size: 20px;
+            color: #4CAF50;
+        }
+        .filters {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding: 10px 0 3px 0;
+            -webkit-overflow-scrolling: touch;
+        }
+        .filter-btn {
+            padding: 8px 15px;
+            background: white;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 18px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            color: #666;
+            cursor: pointer;
+        }
+        .filter-btn.active { background: #4CAF50; color: white; border-color: #4CAF50; }
+        .results { padding: 15px; }
+        .gemmo-card {
+            background: white;
+            border: 2px solid #e8e8e8;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+        .gemmo-card.expanded { border-color: #4CAF50; box-shadow: 0 4px 12px rgba(76, 175, 80, 0.15); }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .card-name { font-size: 18px; font-weight: 700; color: #2E7D32; margin-bottom: 3px; }
+        .card-latin { font-size: 13px; color: #666; font-style: italic; }
+        .expand-icon { font-size: 20px; color: #4CAF50; transition: transform 0.3s; margin-left: 10px; }
+        .gemmo-card.expanded .expand-icon { transform: rotate(180deg); }
+        .tags { display: flex; flex-wrap: wrap; gap: 5px; margin: 10px 0; }
+        .tag {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            color: #2E7D32;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .details { display: none; margin-top: 15px; animation: slideDown 0.3s ease-out; }
+        .gemmo-card.expanded .details { display: block; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        .detail-section {
+            background: #f8f9fa;
+            border-left: 3px solid;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+        }
+        .section-proprieta { border-left-color: #4CAF50; background: linear-gradient(to right, #E8F5E9, #f8f9fa); }
+        .section-indicazioni { border-left-color: #2196F3; background: linear-gradient(to right, #E3F2FD, #f8f9fa); }
+        .section-posologia { border-left-color: #FF9800; background: linear-gradient(to right, #FFF3E0, #f8f9fa); }
+        .section-associazioni { border-left-color: #9C27B0; background: linear-gradient(to right, #F3E5F5, #f8f9fa); }
+        .section-controindicazioni { border-left-color: #F44336; background: linear-gradient(to right, #FFEBEE, #f8f9fa); }
+        .section-note { border-left-color: #607D8B; background: linear-gradient(to right, #ECEFF1, #f8f9fa); }
+        .detail-title { font-weight: 700; font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .section-proprieta .detail-title { color: #388E3C; }
+        .section-indicazioni .detail-title { color: #1976D2; }
+        .section-posologia .detail-title { color: #F57C00; }
+        .section-associazioni .detail-title { color: #7B1FA2; }
+        .section-controindicazioni .detail-title { color: #D32F2F; }
+        .section-note .detail-title { color: #455A64; }
+        .detail-content { font-size: 13px; line-height: 1.6; color: #444; white-space: pre-line; }
+        footer {
+            background: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 2px solid #ddd;
+        }
+        @media (max-width: 768px) {
+            body { padding: 0; }
+            h1 { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌿 Gemmoterapia Clinica Professionale</h1>
+            <p class="subtitle">44 Gemmoderivati Completi - Database Piterà</p>
+        </header>
+        
+        <div class="search-container">
+            <div style="position:relative;">
+                <input type="search" id="searchInput" placeholder="🔍 Cerca per nome, patologia, organo..." autocomplete="off"/>
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="filters">
+                <button class="filter-btn active" data-filter="tutti">Tutti (44)</button>
+                <button class="filter-btn" data-filter="respiratorio">🫁 Respiratorio</button>
+                <button class="filter-btn" data-filter="cardiovascolare">❤️ Cardiovascolare</button>
+                <button class="filter-btn" data-filter="nervoso">🧠 Nervoso</button>
+                <button class="filter-btn" data-filter="osteoarticolare">🦴 Osteoarticolare</button>
+                <button class="filter-btn" data-filter="gastroenterico">🫃 Gastroenterico</button>
+                <button class="filter-btn" data-filter="epatico">🔋 Epatico</button>
+            </div>
+        </div>
+        
+        <div class="results" id="results"></div>
+        
+        <footer>
+            <p><strong>Database Gemmoterapia Clinica Completo</strong></p>
+            <p style="margin:8px 0;">Basato su: Fernando Piterà "Compendio di Gemmoterapia Clinica"</p>
+            <p style="font-size:11px; margin-top:12px; color:#888;">
+                ⚕️ Strumento professionale per naturopati ed erboristi | © 2024
+            </p>
+        </footer>
+    </div>
+
+    <script>
+const gemmoDatabase = [
+{
+    nome: "Abete bianco",
+    latino: "Abies pectinata",
+    tags: ["ossa", "crescita", "bambini", "rachitismo", "calcio", "pediatria"],
+    proprieta: "Rimineralizzante maggiore, ricalcificante, stimolante crescita ed eritropoiesi. Favorisce fissazione calcio nelle ossa. Attivatore osteoblasti. Uno dei migliori rimedi pediatrici.",
+    indicazioni: "OSSA: Rachitismo, osteopenia, osteoporosi, fratture, ritardo crescita, carie, dolori ossei crescita.\nLINFATICO PEDIATRICO: Adenoiditi, tonsilliti, rinofaringiti recidivanti, linfatismo infantile.\nEMATOPOIESI: Anemie, infezioni recidivanti infanzia.",
+    posologia: "ADULTI: 30-50 gocce 2-3 volte/die. Associato: 50-70 gocce 1 volta/die. BAMBINI: 5-15 gocce 2-3 volte/die. CONCENTRATO: 1/10 dose.",
+    associazioni: "★ BETULA: sinergia pediatrica eccellente. ★ RIBES NIGRUM + ROSA CANINA: rinofaringiti recidivanti.",
+    controindicazioni: "Nessuna. Sicuro gravidanza, allattamento, pediatria.",
+    note: "Perfetta tolleranza. Complementare di Betula nelle problematiche crescita."
+},
+{
+    nome: "Acero campestre",
+    latino: "Acer campestre",
+    tags: ["colecisti", "bile", "calcoli", "fegato", "nevralgie", "sciatica"],
+    proprieta: "Eucinetico biliare, colagogo, coleretico. Antispasmodico, antinevralgico. Permette ad altri gemmoderivati di agire meglio.",
+    indicazioni: "EPATO-BILIARE: Litiasi biliare, colecistiti, discinesie biliari, fango biliare, coliche.\nNERVOSO: Nevralgie (facciali, sciatiche), nevriti, nevrosi d'angoscia, ischialgie.\nOCULARE: Cataratta, miodesopsie, atrofia nervo ottico.",
+    posologia: "30-50 gocce 2-3 volte/die. Associato: 50-70 gocce 1 volta/die. COLICA ACUTA: 100 gocce ogni ora. MAX 40 giorni consecutivi.",
+    associazioni: "ROSMARINUS: coliche biliari. FRAXINUS: litiasi. MORUS NIGRA: diabete II. TILIA: nevrosi angoscia.",
+    controindicazioni: "Non oltre 40 giorni consecutivi.",
+    note: "Migliora rendimento altri gemmoderivati prescritti successivamente."
+},
+{
+    nome: "Ontano nero",
+    latino: "Alnus glutinosa",
+    tags: ["cervello", "cefalea", "sinusite", "infiammazione", "mucose", "trombosi"],
+    proprieta: "Antiflogistico maggiore, antitrombotico, vasoprotettivo. Azione su arterie cerebrali e coronarie. Antiflogistico mucose. Rimedio flogosi essudativa.",
+    indicazioni: "CEREBROVASCOLARE: Deficit cerebrali anziano, ischemia cerebrale, arteriosclerosi, vertigini.\nCEFALEE: Emicrania, cefalea vasomotoria.\nRESPIRATORIO: Sinusiti acute/croniche, riniti, faringiti, laringiti, tracheiti.\nMUCOSE: Stomatiti, gengiviti, gastrite, colite, cistite.\nCUTANEO: Orticaria, dermatiti.",
+    posologia: "30-50 gocce 2 volte/die. CEFALEA ACUTA: 50 gocce ogni 4-6 ore. PREVENZIONE: 50-70 gocce con Rosa canina e Ribes per 2-3 mesi.",
+    associazioni: "RIBES NIGRUM + ROSA CANINA: cefalee (cura fondo). CARPINUS + JUGLANS + RIBES: sinusiti ribelli. BETULA PUBESCENS + RIBES: influenza.",
+    controindicazioni: "Non in allattamento (riduce tensione mammaria, galattofugo).",
+    note: "Attivo quando elettroforesi mostra aumento α1 e α2-globuline. Complementare antibiotici in postumi flogistici."
+},
+{
+    nome: "Betulla",
+    latino: "Betula pubescens/verrucosa",
+    tags: ["drenaggio", "reni", "ossa", "crescita", "detox", "linfa"],
+    proprieta: "Drenante renale ed epatico. Stimolante osteoblasti. Detossificante. Riduce acido urico, colesterolo, glicemia. Linfa: drenaggio profondo.",
+    indicazioni: "DRENAGGIO: Renale, epatico, articolare, cutaneo.\nOSSA: Osteoporosi, decalcificazione, rachitismo (con Abies).\nMETABOLISMO: Iperuricemia, ipercolesterolemia, obesità.\nRENI: Albuminuria, calcolosi, edemi, nefrite.\nCUTANEO: Alopecia, seborrea.",
+    posologia: "GEMME: 50 gocce 2 volte/die o 70 gocce 1 volta/die. LINFA: 50-150 gocce/die in acqua fuori pasti. AMENTI: dosi simili gemme.",
+    associazioni: "ABIES: crescita pediatrica (sinergia eccellente). FRAXINUS: iperuricemia, gotta. ROSMARINUS: drenaggio epato-renale. JUNIPERUS: obesità.",
+    controindicazioni: "Linfa: possibile allergia a betullacee.",
+    note: "Linfa si raccoglie primavera. Gemme/amenti tutto anno. Complementare universale per drenaggio."
+},
+{
+    nome: "Carpino bianco",
+    latino: "Carpinus betulus",
+    tags: ["tosse", "bronchite", "sangue", "coagulazione", "piastrine", "vie respiratorie"],
+    proprieta: "Antitussigeno, antispasmodico respiratorio. Regolatore coagulazione e piastrine. Normalizza disglobulinemie. Riduce spasmi bronchiali.",
+    indicazioni: "RESPIRATORIO: Bronchiti croniche, tossi spasmodiche, tracheiti, rinofaringiti, sinusiti.\nSANGUE: Piastrinopenie, trombocitopenie post-farmaci, disglobulinemie, emorragie da anticoagulanti.\nFEGATO: Cirrosi, insufficienza epatica con anemia e piastrinopenia.",
+    posologia: "30-50 gocce 2-3 volte/die. Associato: 50-70 gocce 1 volta/die. MAX 6-8 settimane consecutive.",
+    associazioni: "RIBES + BETULA: rinofaringiti recidivanti. ALNUS + JUGLANS + RIBES: sinusiti. CORNUS: emorragie da anticoagulanti. VIBURNUM: asma.",
+    controindicazioni: "Non oltre 6-8 settimane consecutive.",
+    note: "Limitare prescrizione a dati biologici specifici. Indicato pediatria."
+},
+{
+    nome: "Castagno",
+    latino: "Castanea vesca",
+    tags: ["varici", "circolazione", "linfatico", "edemi", "gambe", "stasi"],
+    proprieta: "Drenante linfatico maggiore. Tonificante venoso. Favorisce circolazione venosa e linfatica arti inferiori. Riduce stasi ed edemi.",
+    indicazioni: "VENOSO: Varici, insufficienza venosa, flebiti, pesantezza gambe, emorroidi.\nLINFATICO: Edemi linfatici, linfedema, stasi linfatica.\nPROSTATA: Congestione prostatica (con altri).\nRESPIRATORIO: Supporto tossi persistenti.",
+    posologia: "50 gocce 2 volte/die o 70 gocce 1 volta/die associato.",
+    associazioni: "AESCULUS + SORBUS: insufficienza venosa con edemi. VACCINIUM MYRTILLUS: emorroidi. HAMAMELIS: varici.",
+    controindicazioni: "Nessuna evidenziata.",
+    note: "Essenziale nelle problematiche circolatorie arti inferiori con componente linfatica."
+},
+{
+    nome: "Nocciolo",
+    latino: "Corylus avellana",
+    tags: ["fegato", "polmone", "enfisema", "fibrosi", "colesterolo", "anemia"],
+    proprieta: "Drenante epatico. Antisclerosante. Azione su fosfolipoproteine. Migliora funzione respiratoria. Regolatore neurovegetativo.",
+    indicazioni: "FEGATO: Steatosi, insufficienza epatica, ipercolesterolemia.\nRESPIRATORIO: Enfisema polmonare, fibrosi polmonare, bronchite cronica.\nSANGUE: Anemie ipocromiche, tendenza trombofilia.\nNERVOSO: Squilibri neurovegetativi, cefalee.",
+    posologia: "30-50 gocce 2-3 volte/die. Associato con Rosmarinus può alternarsi.",
+    associazioni: "ROSMARINUS: steatosi epatica, alternanza possibile. RUBUS: enfisema. TAMARIX: anemie ipocromiche. JUNIPERUS + ALNUS: cirrosi.",
+    controindicazioni: "Nessuna.",
+    note: "Alternanza con Rosmarinus migliora risultati epatici. Azione protidica organotropica."
+},
+{
+    nome: "Biancospino",
+    latino: "Crataegus oxyacantha",
+    tags: ["cuore", "aritmie", "ipertensione", "ansia", "cardiopatico", "tachicardia"],
+    proprieta: "Cardioprotettivo, cardioregolatore. Antiaritmico. Ipotensivo lieve. Ansiolitico cardiaco. Regola frequenza e contrattilità.",
+    indicazioni: "CUORE: Aritmie, tachicardia, extrasistoli, palpitazioni, angina pectoris, insufficienza cardiaca lieve.\nIRTENSIONE: Ipertensione arteriosa (con Olea, Viscum).\nANSIA: Stati ansiosi con somatizzazione cardiaca.",
+    posologia: "50-70 gocce 1 volta/die mattino. O 30-50 gocce 2 volte/die.",
+    associazioni: "OLEA + VISCUM: ipertensione arteriosa. TILIA: palpitazioni, ansia cardiaca. VISCUM: cardioprotettore anziano.",
+    controindicazioni: "Cautela con digitalici (possibile potenziamento). Monitorare.",
+    note: "Sicuro lungo termine. Migliora qualità vita cardiopatico. Azione progressiva."
+},
+{
+    nome: "Faggio",
+    latino: "Fagus sylvatica",
+    tags: ["reni", "allergie", "glomerulonefrite", "purificazione", "immunità"],
+    proprieta: "Drenante renale. Immunoregolatore. Riduce IgE. Azione su glomerulo renale. Antiallergico terreno.",
+    indicazioni: "RENI: Glomerulonefrite, nefrite, insufficienza renale, proteinuria.\nALLERGIE: Allergie croniche, polisensibilizzazioni, asma allergico.\nIMMUNITÀ: Immunodeficienze, infezioni recidivanti.",
+    posologia: "50 gocce 2 volte/die o 70 gocce 1 volta/die.",
+    associazioni: "RIBES + ROSMARINUS: allergie croniche intossicazione. BETULA: glomerulonefrite. VIBURNUM: asma.",
+    controindicazioni: "Nessuna.",
+    note: "Importante nelle allergie con componente renale. Complementare Ribes nelle allergie profonde."
+},
+{
+    nome: "Fico",
+    latino: "Ficus carica",
+    tags: ["stomaco", "ulcera", "gastrite", "stress", "psicosomatico", "ansia digestiva"],
+    proprieta: "Regolatore asse cortico-diencefalico. Regola motilità e secrezione gastroduodenale. Antistress viscerale. Cicatrizzante mucose.",
+    indicazioni: "GASTRICO: Gastrite, ulcera gastroduodenale, pirosi, dispepsia, reflusso.\nINTESTINO: Colon irritabile, colite, meteorismo, aerofagia.\nPSICOSOMATICO: Somatizzazioni digestive, ansia anticipazione, bulimia psicosomatica.\nRADICHETTE: Stipsi, costipazione, ipotonia colon.",
+    posologia: "GEMME: 30-50 gocce 2-3 volte/die. ULCERA: 70 gocce unica dose mattino per 2 mesi, poi 50 gocce. RADICHETTE: con gemme per stipsi.",
+    associazioni: "ALNUS: ulcera cronica gastroduodenale. VACCINIUM VITIS IDAEA: colite. TILIA: colon irritabile, ansia. RIBES: antinfiammatorio.",
+    controindicazioni: "Possibile lieve diarrea prime assunzioni (ridurre dose).",
+    note: "Uno dei rimedi più importanti! 60-80% scomparsa ulcere. Regola sia ipo che iper secrezione."
+},
+{
+    nome: "Frassino",
+    latino: "Fraxinus excelsior",
+    tags: ["gotta", "acido urico", "artrite", "reni", "diuretico", "uricemia"],
+    proprieta: "Uricosurico maggiore. Diuretico, antinfiammatorio articolare. Riduce acido urico. Attività diuretica.",
+    indicazioni: "ARTICOLARE: Gotta, iperuricemia, artrite gottosa, dolori articolari.\nRENI: Litiasi renale, oliguria, ritenzione, insufficienza renale lieve.\nMETABOLISMO: Iperuricemia, ipercolesterolemia.",
+    posologia: "40-50 gocce 2 volte/die. Associato: 70 gocce 1 volta/die. Cure 40-60 giorni, controllare uricemia.",
+    associazioni: "BETULA LINFA: iperuricemia (ottimo). POPULUS + ULMUS: gotta. JUNIPERUS: artrite gottosa. ACER: calcolosi biliare.",
+    controindicazioni: "Nessuna.",
+    note: "Complementare Alnus e Ribes nelle turbe catabolismo nucleoproteine."
+},
+{
+    nome: "Ginkgo",
+    latino: "Ginkgo biloba",
+    tags: ["memoria", "cervello", "circolazione cerebrale", "Alzheimer", "acufeni", "vertigini"],
+    proprieta: "Vasodilatatore cerebrale. Neuroprotettivo. Antiossidante. Antiaggregante piastrinico. Migliora memoria e cognizione.",
+    indicazioni: "CEREBRALE: Deficit memoria, demenza senile, Alzheimer, TIA, RIND, sclerosi cerebrale.\nCIRCOLATORIO: Insufficienza arteriosa arti, arteriopatie.\nUDITIVO: Acufeni, vertigini, ipoacusia vascolare.\nOCULARE: Deficit visivi vascolari, DMLE.",
+    posologia: "50-70 gocce 1 volta/die mattino a lungo termine.",
+    associazioni: "ALNUS + OLEA: deficit cerebrali vascolari. BETULA SEMI: memoria. SEQUOIA: senescenza cerebrale. SORBUS: acufeni.",
+    controindicazioni: "Non con anticoagulanti/antiaggreganti (rischio emorragico). Non gravidanza se minaccia aborto.",
+    note: "Risultati progressivi in settimane/mesi. Sicuro lungo termine se non controindicazioni."
+},
+{
+    nome: "Noce",
+    latino: "Juglans regia",
+    tags: ["pancreas", "diabete", "intestino", "disbiosi", "infezioni", "pelle"],
+    proprieta: "Drenante pancreatico. Antibatterico intestinale. Antimicotico. Regolatore flora batterica. Antinfettivo.",
+    indicazioni: "PANCREAS: Pancreatiti croniche, insufficienza pancreatica.\nINTESTINO: Disbiosi, diarree, enteriti, meteorismo, candidosi intestinale.\nPELLE: Acne, foruncolosi, suppurazioni, herpes, micosi.\nLINFATICO: Adenopatie, linfangiti.",
+    posologia: "50 gocce 2 volte/die. Associato: 70 gocce 1 volta/die. Diarree antibiotici: 50 gocce con Vaccinium vitis per 3-4 settimane.",
+    associazioni: "VACCINIUM VITIS: diarree, enteriti. ULMUS + RIBES: acne pustolosa. CORNUS: stimola macrofagi. OLEA + MORUS: diabete.",
+    controindicazioni: "Nessuna.",
+    note: "Essenziale nelle problematiche intestinali e cutanee infettive."
+},
+{
+    nome: "Olivo",
+    latino: "Olea europaea",
+    tags: ["ipertensione", "colesterolo", "arteriosclerosi", "metabolismo", "anziano"],
+    proprieta: "Ipotensivo, ipocolesterolemizzante, ipoglicemizzante. Vasodilatatore. Antiaterosclerotico. Neuroprotettivo anziano.",
+    indicazioni: "CARDIOVASCOLARE: Ipertensione arteriosa, arteriosclerosi, coronaropatie.\nMETABOLISMO: Ipercolesterolemia, ipertrigliceridemia, diabete II (con altri).\nCEREBRALE: Deficit cerebrali anziano, sclerosi cerebrale.",
+    posologia: "50 gocce 2 volte/die. Associato: 50-70 gocce 1 volta/die mattino.",
+    associazioni: "CRATAEGUS + VISCUM: ipertensione. ROSMARINUS: ipercolesterolemia. MORUS + JUGLANS: diabete II. ALNUS + GINKGO: cerebrali.",
+    controindicazioni: "Nessuna. Non assuefazione.",
+    note: "Sicuro lungo termine. Adatto adulti/anziani. Miglior ipotensivo gemmoterapia."
+},
+{
+    nome: "Quercia",
+    latino: "Quercus peduncolata",
+    tags: ["stanchezza", "astenia", "tonico", "surreni", "energia", "sessuale"],
+    proprieta: "Tonico generale, stimolante surrenalico. Energizzante. Astringente. Azione su 17-chetosteroidi. Rafforza terreno.",
+    indicazioni: "ASTENIA: Stanchezza generale, affaticamento, esaurimento, convalescenza.\nSURRENI: Iposurrenalismo, insufficienza surrenalica.\nSESSUALE: Astenia sessuale, impotenza funzionale (amenti/ghiande).\nCUTANEO: Iperidrosi, ragadi, eczemi umidi (radici).",
+    posologia: "50 gocce 2 volte/die o 70 gocce 1 volta/die mattino. GHIANDE per astenia sessuale.",
+    associazioni: "RIBES: astenia con iposurrenalismo. SEQUOIA: senescenza maschile. BETULA PUBESCENS AMENTI: funzione sessuale.",
+    controindicazioni: "Nessuna.",
+    note: "Adatto tutti terreni vegetativi. Tonico universale. Sicuro lungo termine."
+},
+{
+    nome: "Ribes nero",
+    latino: "Ribes nigrum",
+    tags: ["allergie", "infiammazione", "cortisone naturale", "immunità", "artrite"],
+    proprieta: "Cortison-like naturale. Antinfiammatorio maggiore. Antiallergico. Stimolante corticosurrenale. Immunoregolatore.",
+    indicazioni: "ALLERGIE: Asma, rinite allergica, orticaria, dermatiti, allergie alimentari.\nINFIAMMAZIONE: Tutte le '-iti': artrite, tendinite, sinusite, cistite, prostatite, ecc.\nIMMUNITÀ: Infezioni recidivanti, influenza, mononucleosi.\nARTICOLARE: Artriti, poliartrite, reumatismo infiammatorio.",
+    posologia: "50 gocce 2-3 volte/die. Associato: 70-100-150 gocce mattino. ALLERGIE ACUTE: 100 gocce ogni ora. SEMPRE AL MATTINO (8-10) per sinergizzare cortisolo.",
+    associazioni: "Universale! VIBURNUM: asma. ROSA CANINA: rinofaringiti. ALNUS: sinusiti, cefalee. AMPELOPSIS: artrite. PINUS + VITIS: artrosi.",
+    controindicazioni: "NON in Cushing, feocromocitoma. Cautela ipertesi (non lungo termine).",
+    note: "IL PIÙ IMPORTANTE! Usare sempre al mattino. Riduce VES, regola eosinofili. Sicuro se non controindicazioni."
+},
+{
+    nome: "Rosa canina",
+    latino: "Rosa canina",
+    tags: ["bambini", "infezioni", "immunità", "ricostituente", "ORL", "tonsilliti"],
+    proprieta: "Immunostimolante, ricostituente. Antinfettivo. Stimola difese. Azione su albumine. Rimineralizzante. Tonico bambini.",
+    indicazioni: "PEDIATRICO: Tonsilliti, adenoiditi, otiti, rinofaringiti recidivanti bambini.\nIMMUNITÀ: Infezioni recidivanti, influenza, convalescenza.\nOSSA: Decalcificazione, osteoporosi (con altri).\nCUTANEO: Herpes, verruche, eczemi.",
+    posologia: "50 gocce 2 volte/die o 70 gocce 1 volta/die. Ottimo pediatria.",
+    associazioni: "ABIES + RIBES: rinofaringiti pediatriche. ALNUS + RIBES: cefalee. HIPPOPHAE + ALNUS + BETULA: infezioni recidivanti.",
+    controindicazioni: "Nessuna.",
+    note: "Eccellente bambini. Previene infezioni ORL invernali. Alternare con Ribes."
+},
+{
+    nome: "Rosmarino",
+    latino: "Rosmarinus officinalis",
+    tags: ["fegato", "colesterolo", "disintossicante", "allergie croniche", "metabolismo"],
+    proprieta: "Drenante epatico maggiore. Coleretico, colagogo. Ipocolesterolemizzante. Attivatore enzimatico epatico. Antitossico.",
+    indicazioni: "FEGATO: Steatosi, insufficienza epatica, epatiti croniche, intossicazioni.\nMETABOLISMO: Ipercolesterolemia, ipertrigliceridemia, obesità.\nALLERGIE: Allergie croniche profonde, intolleranze alimentari.\nIMMUNITÀ: Stimola SRE.",
+    posologia: "50 gocce 2 volte/die. Può alternarsi con Corylus per fegato.",
+    associazioni: "OLEA: ipercolesterolemia. JUNIPERUS: steatosi, obesità. RIBES + FAGUS: allergie croniche intossicazione. BETULA: drenaggio epato-renale.",
+    controindicazioni: "Nessuna.",
+    note: "Essenziale nelle epatopatie metaboliche. Alternanza con Corylus ottimizza risultati."
+},
+{
+    nome: "Rovo",
+    latino: "Rubus fruticosus",
+    tags: ["osteoporosi", "menopausa", "polmone", "insufficienza respiratoria", "ossa donna"],
+    proprieta: "Attivatore osteoblasti. Rimineralizzante menopausa. Azione su apparato respiratorio. Migliora capacità respiratoria.",
+    indicazioni: "OSSA: Osteoporosi menopausa, fratture senili.\nRESPIRATORIO: Insufficienza respiratoria, enfisema, bronchite cronica ostruttiva.\nGINECOLOGICO: Fibromi uterini (sensibilizza utero per Vaccinium vitis).",
+    posologia: "50-70 gocce 1 volta/die o 30-50 gocce 2-3 volte/die.",
+    associazioni: "SEQUOIA + VACCINIUM VITIS: osteoporosi anziano. PINUS + ROSA: osteoporosi menopausa. CORYLUS + FAGUS: enfisema. ALNUS INCANA + VACCINIUM VITIS: fibroma.",
+    controindicazioni: "Nessuna.",
+    note: "Importante menopausa osteoporosi. Complementare Lampone (Rubus idaeus)."
+},
+{
+    nome: "Lampone",
+    latino: "Rubus idaeus",
+    tags: ["donna", "menopausa", "ovaie", "utero", "ciclo", "dismenorrea"],
+    proprieta: "Regolatore asse ipotalamo-ipofisi-ovaio. Estroprogestinico naturale. Azione su funzione ovarica. Decontratturante uterino.",
+    indicazioni: "GINECOLOGICO: Dismenorrea, amenorrea, oligomenorrea, menopausa precoce, irregolarità ciclo.\nMENOPAUSA: Vampate, disturbi neurovegetativi, irregolarità premenopausa.\nFERTILITÀ: Sterilità funzionale femminile.",
+    posologia: "50-70 gocce 1 volta/die. O 30-50 gocce 2-3 volte/die. Alternare mensilmente in amenorrea.",
+    associazioni: "TILIA: dismenorrea. VACCINIUM VITIS: menopausa. RIBES: cisti ovariche. ALNUS INCANA + RUBUS FRUTICOSUS: fibroma.",
+    controindicazioni: "Nessuna.",
+    note: "Rimedio femminile per eccellenza. Regola funzione ovarica fisiologicamente."
+},
+{
+    nome: "Salice bianco",
+    latino: "Salix alba",
+    tags: ["sessuale", "anafrodisiaco", "eretismo", "menopausa", "occhi"],
+    proprieta: "AMENTI: Anafrodisiaco, regolatore eretismo sessuale. GEMME: Riequilibrante limbico. LINFA: Trofica occhio, cristallino.",
+    indicazioni: "AMENTI: Ninfomania, priapismo, eiaculazione precoce, ipersensibilità genitale, dismenorrea.\nGEMME: Nevrosi gastrica, ansietà, vertigini.\nLINFA: Cataratta, opacità cristallino, miodesopsie, uveite.",
+    posologia: "AMENTI/GEMME: 50 gocce 2 volte/die. LINFA: 50 gocce 2 volte/die.",
+    associazioni: "AMENTI con TILIA: angoscia, ansia. LINFA con VACCINIUM MYRTILLUS: vista, cataratta.",
+    controindicazioni: "Nessuna.",
+    note: "AMENTI riportano desiderio a livelli fisiologici. Non è inibitore ma regolatore."
+},
+{
+    nome: "Sequoia",
+    latino: "Sequoia gigantea",
+    tags: ["anziano", "prostata", "andropausa", "ossa", "senescenza", "memoria"],
+    proprieta: "Tonico senescenza maschile. Azione su 17-chetosteroidi. Stimolante prostatico. Osteoblastico anziano. Neuroprotettivo.",
+    indicazioni: "PROSTATA: Adenoma prostatico, ipertrofia, prostatite cronica.\nSENESCENZA: Andropausa, astenia anziano, depressione senile.\nOSSA: Osteoporosi senile, consolidamento fratture anziano.\nCEREBRALE: Deficit memoria, Alzheimer, sclerosi.",
+    posologia: "50-60-70 gocce 1-2 volte/die mattino e/o pranzo. Cicli 20 giorni/mese per mesi.",
+    associazioni: "BETULA PUBESCENS AMENTI + QUERCUS: senescenza maschile. RIBES + JUGLANS: prostatite. PYRUS: ipertrofia prostatica. RUBUS + VACCINIUM VITIS: osteoporosi.",
+    controindicazioni: "NON in: Cushing, tumori testicolo secernenti, tumori surrene virilizzanti, tumore ovarico virilizzante, gravidanza III trimestre.",
+    note: "Ottimo anziano. Migliora tono e umore. Sicuro lungo termine se non controindicazioni."
+},
+{
+    nome: "Tiglio",
+    latino: "Tilia tomentosa",
+    tags: ["ansia", "insonnia", "nervosismo", "tranquillante", "bambini", "palpitazioni"],
+    proprieta: "Sedativo, ansiolitico, antispasmodico. Tranquillante vegetale. Azione su SNC. Rilassante muscolare. Ipnotico dolce.",
+    indicazioni: "NERVOSO: Ansia, angoscia, attacchi panico, insonnia, nervosismo, nevrosi.\nSPASMI: Spasmofilia, crampi, emicranie tensive.\nCARDIACO: Palpitazioni ansiose, aritmie emotive.\nPEDIATRICO: Ipercinesia, insonnia bambini, dentizione dolorosa.",
+    posologia: "50-70 gocce 1+ volte/die. BAMBINI: 10-30 gocce sera. Ultima dose 1h prima coricarsi.",
+    associazioni: "CRATAEGUS: palpitazioni. FICUS: gastroduodenite, stress viscerale. VACCINIUM VITIS: colon irritabile. ACER: nevrosi angoscia. TAMARIX: coliche lattante.",
+    controindicazioni: "Nessuna. Sicuro gravidanza, pediatria, anziani.",
+    note: "Privo tossicità. Senza accumulo. Tranquillante gemmoterapia. Ottimo pediatria."
+},
+{
+    nome: "Olmo campestre",
+    latino: "Ulmus campestris",
+    tags: ["pelle", "acne", "eczema", "herpes", "dermatiti", "seborrea"],
+    proprieta: "Drenante cutaneo. Antiessudativo. Depurativo. Azione su dermatosi. Normalizza secrezioni cutanee.",
+    indicazioni: "CUTANEO: Acne, eczemi, herpes ricorrente, dermatiti, seborrea, foruncoli.\nMUCOSE: Lesioni mucosali, erosioni.\nARTICOLARE: Gotta (con altri), reumatismi.",
+    posologia: "30-50 gocce 2-3 volte/die o 50-70 gocce 1 volta/die.",
+    associazioni: "JUGLANS + RIBES: acne pustolosa. CEDRUS: eczemi, dermatosi croniche. ROSA CANINA: herpes ricorrente. FRAXINUS + POPULUS: gotta.",
+    controindicazioni: "Nessuna.",
+    note: "Essenziale dermatologia gemmoterapica. Complementare Cedrus."
+},
+{
+    nome: "Mirtillo nero",
+    latino: "Vaccinium myrtillus",
+    tags: ["occhi", "vista", "retina", "diabete", "intestino", "vasi"],
+    proprieta: "Vasoproteggente capillare. Trofico occhio/retina. Ipoglicemizzante. Astringente intestinale. Migliora microcircolo.",
+    indicazioni: "OCCHI: Retinopatia diabetica, miopia, retinite, deficit visivi, emeralopia.\nVASCOLARE: Fragilità capillare, emorroidi, varici, couperose.\nINTESTINO: Diarree, enteriti, colibacillosi, disbiosi.\nDIABETE: Complicanze microangiopatiche diabete.",
+    posologia: "40-50 gocce 2-3 volte/die. Associato: 50-70 gocce 1 volta/die. ENTERITI: fino 70-100 gocce multiple fino miglioramento.",
+    associazioni: "MORUS: diabete, retinopatia diabetica. SALIX LINFA: cataratta, vista. AESCULUS + CASTANEA: emorroidi. JUGLANS + VACCINIUM VITIS: enteriti.",
+    controindicazioni: "Nessuna ai dosaggi consigliati.",
+    note: "Straordinario per occhi e vista. Migliora acuità visiva. Complementare Vaccinium vitis idaea."
+},
+{
+    nome: "Mirtillo rosso",
+    latino: "Vaccinium vitis idaea",
+    tags: ["intestino", "cistite", "donna", "menopausa", "colon", "vescica"],
+    proprieta: "Antinfettivo urinario. Regolatore intestinale. Azione su mucose. Tonico senescenza femminile. Normalizza transito.",
+    indicazioni: "URINARIO: Cistiti ricorrenti, colibacillosi, infezioni urinarie.\nINTESTINO: Colite, colon irritabile, diarree, enterocoliti.\nDONNA: Senescenza femminile, menopausa, fibroma (sensibilizzato da Rubus fruticosus).\nOSSA: Osteoporosi (con altri).",
+    posologia: "40-50 gocce 2 volte/die o 50-70 gocce 1 volta/die.",
+    associazioni: "CALLUNA: cistiti. FICUS + TILIA: colon irritabile. RUBUS IDAEUS: menopausa. VACCINIUM MYRTILLUS + JUGLANS: enteriti. ALNUS INCANA + RUBUS FRUTICOSUS: fibroma.",
+    controindicazioni: "Nessuna.",
+    note: "Essenziale cistiti recidivanti donne. Complementare Vaccinium myrtillus."
+},
+{
+    nome: "Lantana",
+    latino: "Viburnum lantana",
+    tags: ["asma", "allergie respiratorie", "polmone", "broncospasmo", "dispnea"],
+    proprieta: "Antispasmodico respiratorio maggiore. Antiallergico mucose respiratorie. Riduce broncospasmo. Azione su vie aeree.",
+    indicazioni: "RESPIRATORIO: Asma bronchiale allergico, dispnea, tossi spasmodiche, laringospasmo.\nALLERGIE: Allergie respiratorie, riniti spasmodiche.\nALTRO: Dismenorrea, gozzo eutiroideo.",
+    posologia: "50 gocce 1 volta/die. ASMA: sempre con Ribes nigrum 50-70 gocce.",
+    associazioni: "RIBES: asma allergico (sempre insieme). CORYLUS: bronchite cronica asmatiforme. ALNUS: allergie mucosali. ROSMARINUS: allergie croniche.",
+    controindicazioni: "Nessuna.",
+    note: "Nel Basedow: schema con Cornus + Crataegus + Tilia. Nell'eczema atopico con Melittis."
+},
+{
+    nome: "Vischio",
+    latino: "Viscum album",
+    tags: ["ipertensione", "cuore", "vertigini", "anziano", "regolatore pressorio"],
+    proprieta: "Ipotensivo, cardioregolatore. Regola pressione. Azione su SNC. Antispasmodico vascolare.",
+    indicazioni: "CARDIOVASCOLARE: Ipertensione arteriosa, aritmie, arteriosclerosi.\nNERVOSO: Vertigini, cefalee vascolari.\nANZIANO: Disturbi cardiovascolari senescenza.",
+    posologia: "50 gocce 2 volte/die o 70 gocce 1 volta/die.",
+    associazioni: "CRATAEGUS + OLEA: ipertensione arteriosa (triade classica). TILIA: palpitazioni, ansia.",
+    controindicazioni: "Non gravidanza, allattamento, infanzia. Cautela ipotensione.",
+    note: "Nella triade ipotensiva con Crataegus e Olea. Azione progressiva."
+},
+{
+    nome: "Vite",
+    latino: "Vitis vinifera",
+    tags: ["articolazioni", "infiammazione cronica", "artrosi", "deformante"],
+    proprieta: "Antinfiammatorio articolare cronico. Azione su deformazioni articolari. Riduce noduli, rigidità. Antiflogistico tessuti.",
+    indicazioni: "ARTICOLARE: Artrosi deformante, poliartrite cronica, reumatismo cronico, rigidità articolari.\nALTRO: Linfoadenopatie, verruche, mononucleosi (con altri).",
+    posologia: "50 gocce 2 volte/die o 70 gocce 1 volta/die.",
+    associazioni: "PINUS + RIBES: artrosi. AMPELOPSIS: reumatismo infiammatorio. ALNUS + FICUS: Morbo Crohn. ROSA CANINA + FICUS: verruche.",
+    controindicazioni: "Nessuna.",
+    note: "Importante artrosi croniche deformanti. Azione lenta ma profonda."
+},
+{
+    nome: "Ippocastano",
+    latino: "Aesculus hippocastanum",
+    tags: ["varici", "emorroidi", "circolazione", "edemi", "gambe pesanti"],
+    proprieta: "Venotonico, capillaro-protettore. Antiedemigeno. Riduce permeabilità capillare. Decongestionante venoso.",
+    indicazioni: "VENOSO: Varici, insufficienza venosa, emorroidi, flebiti, pesantezza gambe.\nEDEMI: Edemi arti inferiori, stasi venolinfatica.\nTRAUMI: Ematomi, contusioni, distorsioni.",
+    posologia: "50-150 gocce/die in 2-3 somministrazioni. Associato: 50-70 gocce 1 volta/die.",
+    associazioni: "CASTANEA + SORBUS: insufficienza venosa con edemi. CASTANEA: varici. VACCINIUM MYRTILLUS: fragilità capillare. CITRUS: tromboflebite.",
+    controindicazioni: "Nessuna. Sicuro gravidanza se necessario.",
+    note: "Più attivo se surrene integro, altrimenti associare Ribes. Complementare Castanea."
+},
+{
+    nome: "Ontano bianco",
+    latino: "Alnus incana",
+    tags: ["cervello anziano", "memoria", "fibromi", "trofico cerebrale"],
+    proprieta: "Trofico cerebrale anziano. Vasodilatatore cerebrale. Azione su fibromi. Migliora irrorazione cerebrale.",
+    indicazioni: "CEREBRALE: Deficit memoria anziano, arteriosclerosi cerebrale, vertigini.\nGINECOLOGICO: Fibromi uterini.\nALTRO: Cefalee, sinusiti croniche.",
+    posologia: "50 gocce 2 volte/die o 70 gocce 1 volta/die.",
+    associazioni: "ALNUS GLUTINOSA: deficit cerebrali. OLEA: arteriosclerosi. RUBUS FRUTICOSUS + VACCINIUM VITIS: fibroma. RIBES + RUBUS IDAEUS: fibroma.",
+    controindicazioni: "Non allattamento (galattofugo).",
+    note: "Complementare Alnus glutinosa per cervello. Azione su α-globuline."
+},
+{
+    nome: "Vite vergine",
+    latino: "Ampelopsis veitchii",
+    tags: ["articolazioni", "aderenze", "fibrosi", "Dupuytren", "tendiniti"],
+    proprieta: "Antifibrotico, anti-aderenziale. Azione su tessuto connettivo. Riduce aderenze, fibrosi. Antinfiammatorio articolare.",
+    indicazioni: "ARTICOLARE: Periartrite, tendiniti, sinoviti, aderenze post-traumatiche/chirurgiche.\nFIBROSI: Dupuytren, Ledderhose, Peyronie, fibrosi varie.\nRETTI: Limitazioni articolari, rigidità.",
+    posologia: "30-50 gocce 2-3 volte/die o 50-70 gocce 1 volta/die.",
+    associazioni: "RIBES: reumatismo infiammatorio. PINUS + VITIS: artrosi. BETULA: tendiniti. POPULUS + RIBES: dolori articolari.",
+    controindicazioni: "Nessuna.",
+    note: "Straordinario per aderenze e fibrosi. Migliora mobilità articolare."
+},
+{
+    nome: "Cedro del Libano",
+    latino: "Cedrus libani",
+    tags: ["pelle secca", "eczema", "psoriasi", "cheratosi", "dermatiti croniche"],
+    proprieta: "Trofico cute secca. Azione su cheratosi. Regolatore ghiandole sebacee/sudoripare. Drenante cutaneo profondo.",
+    indicazioni: "CUTANEO: Eczemi secchi recidivanti, psoriasi, cheratosi, ittiosi, pelle disidratata.\nMUCOSE: Lesioni mucosali da intossicazione, irritazioni mucose digestive.",
+    posologia: "30-50 gocce 2-3 volte/die o 50-70 gocce 1 volta/die.",
+    associazioni: "PLATANUS + ULMUS: dermatosi croniche. RIBES: dermatite atopica. PLATANUS: psoriasi. FICUS: ulcera duodenale.",
+    controindicazioni: "Nessuna.",
+    note: "Eccellente dermatosi secche croniche. Complementare Platanus e Ulmus."
+},
+{
+    nome: "Limone",
+    latino: "Citrus limonum",
+    tags: ["sangue", "fluidificante", "trombosi", "circolazione", "protezione vascolare"],
+    proprieta: "Fluidificante ematico. Antitrombotico. Protettore vascolare. Riduce viscosità sangue. Ipocolesterolemizzante.",
+    indicazioni: "EMATICO: Iperviscosità, trombofilie, iperfibrinogenemia.\nVASCOLARE: Prevenzione trombosi, flebiti, aterosclerosi carotidea.\nCIRCOLATORIO: Protezione vascolare generale.",
+    posologia: "50 gocce 2 volte/die o 70 gocce 1 volta/die.",
+    associazioni: "AESCULUS: tromboflebite. OLEA: ateromi carotidei. CORNUS: fattori rischio vascolare. GINKGO + PRUNUS: trombosi.",
+    controindicazioni: "Cautela con anticoagulanti (potenziamento).",
+    note: "Importante prevenzione cardiovascolare. Fluidificante naturale."
+},
+{
+    nome: "Sanguinello",
+    latino: "Cornus sanguinea",
+    tags: ["tiroide", "arterie", "coronarie", "anticoagulante", "Basedow"],
+    proprieta: "Regolatore tiroideo. Anticoagulante. Protettore arterie coronarie. Stimola macrofagi epatici.",
+    indicazioni: "TIROIDE: Ipertiroidismo, Basedow, gozzo.\nCARDIOVASCOLARE: Coronaropatie, angina, arteriopatie trombotiche.\nEMATICO: Emorragie anticoagulanti (con Carpinus).",
+    posologia: "50 gocce 2 volte/die o 70 gocce 1 volta/die.",
+    associazioni: "VIBURNUM + CRATAEGUS + TILIA: Basedow (schema Poi Henry). ROSA CANINA: gozzo eutiroideo. CERCIS + POPULUS: trombosi arteriose.",
+    controindicazioni: "Cautela anticoagulanti.",
+    note: "Nel Basedow seguire schema specifico Poi Henry. Monitorare tiroide."
+},
+{
+    nome: "Ginepro",
+    latino: "Juniperus communis",
+    tags: ["fegato", "reni", "detox", "edemi", "diuretico", "drenaggio"],
+    proprieta: "Drenante epato-renale. Diuretico, depurativo. Stimolante metabolico. Riduce ritenzione. Detossificante.",
+    indicazioni: "FEGATO: Steatosi, insufficienza epatica, cirrosi (con altri).\nRENI: Oliguria, edemi, ritenzione, litiasi.\nMETABOLISMO: Obesità, iperuricemia, gotta.\nDETOX: Intossicazioni generali.",
+    posologia: "50 gocce 2 volte/die o 70 gocce 1 volta/die. Ultimo trimestre gravidanza solo fine per facilitare parto.",
+    associazioni: "ROSMARINUS: steatosi, obesità, ipertensione portale. BETULA: drenaggio renale. OLEA: metabolismo. FRAXINUS: gotta.",
+    controindicazioni: "Non primi 6 mesi gravidanza (tonico utero). OK ultimo trimestre.",
+    note: "Essenziale drenaggio profondo. Attenzione gravidanza primi mesi."
+},
+{
+    nome: "Melo",
+    latino: "Malus sylvestris",
+    tags: ["cervello", "ansia", "paure", "nervosismo", "ipertensione emotiva"],
+    proprieta: "Ansiolitico, rilassante cerebrale. Ipotensivo lieve. Regolatore neuropsichico. Azione su paure.",
+    indicazioni: "NERVOSO: Ansia, paure, fobie, attacchi panico, nervosismo.\nCEREBRALE: Cefalee da tensione, emicranie.\nCARDIOVASCOLARE: Ipertensione emotiva.",
+    posologia: "30-40 gocce 2-3 volte/die o 50-70 gocce 1 volta/die.",
+    associazioni: "ALNUS + ROSA: emicrania. BETULA SEMI + GINKGO: memoria. FICUS: gastroduodenite. RIBES + QUERCUS: astenia.",
+    controindicazioni: "Nessuna.",
+    note: "Radici: antidiabetiche (supporto diabete infantile). Ottimo ansioso con somatizzazioni."
+},
+{
+    nome: "Gelso nero",
+    latino: "Morus nigra",
+    tags: ["diabete", "glicemia", "pancreas", "metabolismo glucidico"],
+    proprieta: "Ipoglicemizzante. Regolatore metabolismo glucidico. Azione su pancreas endocrino. Riduce glicemia.",
+    indicazioni: "METABOLISMO: Diabete tipo II, intolleranza glucidica, iperglicemia.\nVASCOLARE: Complicanze vascolari diabete.\nOCCHI: Retinopatia diabetica (con Vaccinium myrtillus).",
+    posologia: "50 gocce 2-3 volte/die prima pasti o 50-70 gocce 1 volta/die. RADICI: 30-50 gocce 2-3 volte/die.",
+    associazioni: "JUGLANS + OLEA: diabete tipo II. ACER: intolleranza glucidica. VACCINIUM MYRTILLUS: complicanze diabete. FICUS + ALNUS: mucose GI.",
+    controindicazioni: "Nessuna.",
+    note: "Monitorare glicemia. Ottimo coadiuvante terapia diabete. Radici asma, edemi."
+},
+{
+    nome: "Pino mugo",
+    latino: "Pinus montana",
+    tags: ["articolazioni", "artrosi", "cartilagine", "ossa", "colonna"],
+    proprieta: "Condroprotettore, rigeneratore cartilagineo. Rimineralizzante. Antalgico articolare. Trofico osteo-cartilagineo.",
+    indicazioni: "ARTICOLARE: Artrosi (cervicale, lombare, anca, ginocchio), coxartrosi, gonartrosi.\nOSSA: Osteoporosi, consolidamento fratture anziano.\nCARTILAGINE: Degenerazione cartilaginea, condropatie.",
+    posologia: "50 gocce 2 volte/die o 70 gocce 1 volta/die.",
+    associazioni: "RIBES + VITIS: artrosi. ROSA CANINA: artrosi con osteoporosi. AMPELOPSIS: periartrite. SEQUOIA: fratture anziano.",
+    controindicazioni: "Nessuna.",
+    note: "IL rimedio artrosi! Azione progressiva su cartilagine. Associare sempre Ribes."
+},
+{
+    nome: "Platano",
+    latino: "Platanus orientalis",
+    tags: ["pelle", "psoriasi", "vitiligine", "pigmentazione", "dermatiti squamose"],
+    proprieta: "Trofico cute. Regolatore pigmentazione. Azione su dermatosi squamose. Riequilibrante melanociti.",
+    indicazioni: "CUTANEO: Psoriasi, vitiligine, dermatiti squamose, macchie cutanee.\nOCCHI: Calazi, orzaioli (con Ficus).",
+    posologia: "30-50 gocce 2-3 volte/die o 50-70 gocce 1 volta/die.",
+    associazioni: "CEDRUS: psoriasi, dermatosi secche. SECALE: psoriasi. FICUS: calazi, orzaioli. ULMUS: dermatiti.",
+    controindicazioni: "Nessuna.",
+    note: "Importante psoriasi e vitiligine. Azione lenta, trattamenti prolungati."
+},
+{
+    nome: "Pioppo nero",
+    latino: "Populus nigra",
+    tags: ["arterie", "circolazione", "tracheite", "bronchite", "tosse"],
+    proprieta: "Protettore arterioso. Antispasmodico vie aeree. Azione su arterie e bronchi. Cicatrizzante vascolare.",
+    indicazioni: "ARTERIOSO: Arteriopatie arti inferiori, claudicatio, protezione arteriosa.\nRESPIRATORIO: Bronchiti croniche, tracheiti, tossi persistenti.\nARTICOLARE: Gotta, reumatismi (con altri).",
+    posologia: "50 gocce 2 volte/die o 70 gocce 1 volta/die mattino.",
+    associazioni: "ALNUS + GINKGO: arteriopatie arti. ALNUS + JUGLANS: tracheobronchite. CARPINUS + RIBES: tracheite. FRAXINUS + ULMUS: gotta.",
+    controindicazioni: "Uso prolungato può aumentare α2-globuline.",
+    note: "Complementare Alnus glutinosa. Monitorare se uso prolungato."
+},
+{
+    nome: "Mandorlo",
+    latino: "Prunus amygdalus",
+    tags: ["colesterolo", "trigliceridi", "arterosclerosi", "metabolismo lipidico"],
+    proprieta: "Ipocolesterolemizzante, ipotrigliceridemizzante. Regolatore metabolismo lipidico. Antiaterosclerotico.",
+    indicazioni: "METABOLISMO: Ipercolesterolemia, ipertrigliceridemia tipo IV, dislipidemie.\nVASCOLARE: Arteriosclerosi, prevenzione cardiovascolare.\nNERVOSO: Nevrosi fobiche, ossessive (con Olea).",
+    posologia: "50 gocce 2 volte/die o 70 gocce 1 volta/die.",
+    associazioni: "ROSMARINUS: ipertrigliceridemia IV. OLEA + JUNIPERUS: dislipidemie. CERCIS: tromboflebiti. GINKGO: iperaggregabilità.",
+    controindicazioni: "Nessuna.",
+    note: "Importante dislipidemie. Complementare Olea e Rosmarinus."
+},
+{
+    nome: "Prugnolo",
+    latino: "Prunus spinosa",
+    tags: ["energia", "tonico", "stimolante", "crescita armonica", "stanchezza"],
+    proprieta: "Tonico generale, stimolante. Armonizzante crescita. Energizzante. Azione vitale. Regolatore neurovegetativo.",
+    indicazioni: "GENERALE: Astenia, stanchezza cronica, esaurimento, convalescenza.\nCRESCITA: Armonizza crescita (con Abies, Betula).\nNERVOSO: Surmenage, stress, neurastenia.",
+    posologia: "50 gocce 2 volte/die o 70 gocce 1 volta/die mattino.",
+    associazioni: "QUERCUS + RIBES: surmenage intellettuale. ABIES + BETULA: crescita pediatrica. RIBES: iposurrenalismo. TILIA: stress.",
+    controindicazioni: "Nessuna.",
+    note: "Ottimo tonico generale. Azione armonizzante. Sicuro tutti."
+},
+{
+    nome: "Pero",
+    latino: "Pyrus communis",
+    tags: ["prostata", "detox", "chemioterapia", "supporto oncologico"],
+    proprieta: "Protettore in chemio/radioterapia. Drenante. Detossificante. Azione su prostata. Supporto oncologico.",
+    indicazioni: "ONCOLOGICO: Supporto chemio/radioterapia, detossificazione.\nPROSTATA: Ipertrofia prostatica (con Sequoia).\nLINFATICO: Linfoadenomegalie, linfomi (coadiuvante).\nUROLOGICO: Cistiti (con Calluna).",
+    posologia: "50 gocce 2-3 volte/die in chemio. Prostata: 50 gocce alternando con Sequoia.",
+    associazioni: "SEQUOIA: ipertrofia prostatica (alternanza). CASTANEA: linfedemi. VITIS: linfoadenopatie. FRAXINUS: gotta.",
+    controindicazioni: "Nessuna.",
+    note: "Importante supporto oncologico. Detossifica da chemio. Alternare con Sequoia per prostata."
+},
+{
+    nome: "Sorbo",
+    latino: "Sorbus domestica",
+    tags: ["acufeni", "vertigini", "Ménière", "orecchio", "circolazione orecchio"],
+    proprieta: "Trofico orecchio interno. Vasoregolatore labirinto. Azione su acufeni, vertigini. Protettore microcircolo auricolare.",
+    indicazioni: "UDITIVO: Acufeni, tinnitus, vertigini, sindrome Ménière, ipoacusia vascolare.\nCIRCOLATORIO: Insufficienza venosa (con altri), edemi linfatici.",
+    posologia: "50 gocce 2 volte/die o 70 gocce 1 volta/die.",
+    associazioni: "GINKGO: acufeni, vertigini. AESCULUS: insufficienza venosa. CASTANEA: edemi linfatici. VIBURNUM: ipoacusia.",
+    controindicazioni: "Nessuna.",
+    note: "IL rimedio acufeni e vertigini! Trattamenti prolungati. Risultati progressivi."
+},
+{
+    nome: "Tamerice",
+    latino: "Tamarix gallica",
+    tags: ["sangue", "anemia", "milza", "piastrine", "ematopoiesi"],
+    proprieta: "Stimolante ematopoiesi. Antianemico. Azione su milza. Stimola produzione eritrociti. Regola piastrine.",
+    indicazioni: "SANGUE: Anemie (tutte), piastrinopenie, leucopenie, splenomegalia.\nPEDIATRICO: Anemie bambini, coliche lattante (con Tilia).\nINFEZIONI: Mononucleosi (con altri).",
+    posologia: "50-70 gocce 2-3 volte/die o in alternanza altri gemmoderivati.",
+    associazioni: "CORYLUS: anemie ipocromiche (alternare). ROSA: albumine. ABIES: anemie pediatriche. RIBES + VITIS: mononucleosi. TILIA: coliche lattante.",
+    controindicazioni: "Nessuna.",
+    note: "Importante tutte anemie. Ottimo pediatria. Alternare con Corylus migliora risultati."
+}
+];
+
+        // RESTO DEL JAVASCRIPT PER RICERCA E VISUALIZZAZIONE
+        let currentFilter = 'tutti';
+        let searchTerm = '';
+
+        function renderResults() {
+            const container = document.getElementById('results');
+            let filtered = gemmoDatabase;
+
+            if (currentFilter !== 'tutti') {
+                const term = currentFilter.toLowerCase();
+                filtered = filtered.filter(item =>
+                    item.tags.some(tag => tag.includes(term)) ||
+                    item.indicazioni.toLowerCase().includes(term) ||
+                    item.proprieta.toLowerCase().includes(term)
+                );
+            }
+
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                filtered = filtered.filter(item =>
+                    item.nome.toLowerCase().includes(term) ||
+                    item.latino.toLowerCase().includes(term) ||
+                    item.tags.some(tag => tag.toLowerCase().includes(term)) ||
+                    item.proprieta.toLowerCase().includes(term) ||
+                    item.indicazioni.toLowerCase().includes(term) ||
+                    item.posologia.toLowerCase().includes(term) ||
+                    item.associazioni.toLowerCase().includes(term)
+                );
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding:60px 20px; color:#999;">
+                        <div style="font-size:56px; margin-bottom:16px;">🔍</div>
+                        <p style="font-size:18px; font-weight:600; margin-bottom:8px;">Nessun gemmoderivato trovato</p>
+                        <p style="font-size:14px;">Prova con altri termini di ricerca</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(item => `
+                <div class="gemmo-card" onclick="this.classList.toggle('expanded')">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-name">${item.nome}</div>
+                            <div class="card-latin">${item.latino}</div>
+                        </div>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    
+                    <div class="tags">
+                        ${item.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                    
+                    <div class="details">
+                        <div class="detail-section section-proprieta">
+                            <div class="detail-title">✨ Proprietà Principali</div>
+                            <div class="detail-content">${item.proprieta}</div>
+                        </div>
+                        
+                        <div class="detail-section section-indicazioni">
+                            <div class="detail-title">📋 Indicazioni Cliniche</div>
+                            <div class="detail-content">${item.indicazioni}</div>
+                        </div>
+                        
+                        <div class="detail-section section-posologia">
+                            <div class="detail-title">💊 Posologia</div>
+                            <div class="detail-content">${item.posologia}</div>
+                        </div>
+                        
+                        <div class="detail-section section-associazioni">
+                            <div class="detail-title">🤝 Associazioni Sinergiche</div>
+                            <div class="detail-content">${item.associazioni}</div>
+                        </div>
+                        
+                        <div class="detail-section section-controindicazioni">
+                            <div class="detail-title">⚠️ Controindicazioni</div>
+                            <div class="detail-content">${item.controindicazioni}</div>
+                        </div>
+                        
+                        <div class="detail-section section-note">
+                            <div class="detail-title">📝 Note Cliniche</div>
+                            <div class="detail-content">${item.note}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            searchTerm = e.target.value;
+            renderResults();
+        });
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                renderResults();
+            });
+        });
+
+        renderResults();
+    </script>
+</body>
+</html>
