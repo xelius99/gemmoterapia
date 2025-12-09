@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gemmoterapia Piterà - App Completa</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  color: #fff;
+  padding: 10px;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+header {
+  text-align: center;
+  padding: 20px 10px;
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 20px;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 5px;
+}
+
+.tab {
+  flex: 1;
+  padding: 12px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.tab.active {
+  background: #fff;
+  color: #1e3c72;
+}
+
+.search-box {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  background: #fff;
+  color: #333;
+}
+
+input[type="text"]::placeholder {
+  color: #999;
+}
+
+.list-container {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 15px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.item {
+  background: rgba(255,255,255,0.15);
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-left: 4px solid transparent;
+}
+
+.item:hover {
+  background: rgba(255,255,255,0.25);
+  border-left-color: #fff;
+  transform: translateX(5px);
+}
+
+.item-name {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.item-common {
+  font-size: 14px;
+  opacity: 0.8;
+  margin-bottom: 5px;
+}
+
+.item-part {
+  font-size: 13px;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.item-count {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-top: 5px;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  z-index: 1000;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.modal-content {
+  max-width: 800px;
+  margin: 20px auto;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  border-radius: 15px;
+  padding: 25px;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+
+.close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 32px;
+  cursor: pointer;
+  color: #fff;
+  line-height: 1;
+  font-weight: 300;
+}
+
+.detail-header {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(255,255,255,0.2);
+}
+
+.detail-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.detail-subtitle {
+  font-size: 15px;
+  opacity: 0.9;
+}
+
+.detail-section {
+  margin-bottom: 20px;
+  background: rgba(255,255,255,0.1);
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #ffd700;
+}
+
+.section-content {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.indication-item {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.indication-item:last-child {
+  border-bottom: none;
+}
+
+.gemmo-item {
+  background: rgba(255,255,255,0.1);
+  padding: 10px 12px;
+  margin: 5px 0;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.hidden {
+  display: none;
+}
+
+.no-results {
+  text-align: center;
+  padding: 30px;
+  font-size: 16px;
+  opacity: 0.7;
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 20px;
+  }
+  
+  .modal-content {
+    padding: 20px 15px;
+  }
+  
+  .detail-title {
+    font-size: 19px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>🌿 Gemmoterapia Clinica</h1>
+    <div class="subtitle">52 Gemmoderivati • 303 Patologie • Indice Clinico Completo</div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('gemmo')">Gemmoderivati</button>
+    <button class="tab" onclick="switchTab('patologie')">Patologie</button>
+  </div>
+
+  <div id="gemmoTab">
+    <div class="search-box">
+      <input type="text" id="searchGemmo" placeholder="🔍 Cerca gemmoderivato..." oninput="filterGemmo()">
+    </div>
+    <div class="list-container" id="gemmoList"></div>
+  </div>
+
+  <div id="patologieTab" class="hidden">
+    <div class="search-box">
+      <input type="text" id="searchPat" placeholder="🔍 Cerca patologia..." oninput="filterPat()">
+    </div>
+    <div class="list-container" id="patList"></div>
+  </div>
+</div>
+
+<div id="modal" class="modal" onclick="closeModalClick(event)">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+var currentTab = 'gemmo';
+var currentFilteredGemmo = [];
+var currentFilteredPat = [];
+
+var DB = [
+  {
+    "nome": "Abies pectinata",
+    "parte": "gemme",
+    "indicazioni": ["Demineralizzazione", "Decalcificazione", "Rachitismo", "Osteoporosi", "Consolidamento fratture", "Rinofaringiti recidivanti infanzia", "Adenoiditi", "Linfatismo"],
+    "posologia": "30-50 gocce 2-3 volte al dì; oppure 50-70 gocce 1 volta al dì se in associazione. Bambini: 5-15 gocce 2-3 volte al dì",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Betula verrucosa", "Ribes nigrum", "Rosa canina", "Quercus peduncolata"]
+  },
+  {
+    "nome": "Acer campestre",
+    "parte": "gemme",
+    "indicazioni": ["Arteriosclerosi", "Litiasi biliare", "Colecistite", "Dislipidemia", "Herpes zoster", "Nevralgie", "Iperglicemia"],
+    "posologia": "30-50 gocce 2-3 volte al dì; oppure 50-70 gocce 1 volta al dì se in associazione. IMPORTANTE: max 40 giorni consecutivi",
+    "controindicazioni": "Non oltre 40 giorni consecutivi",
+    "sinergie": ["Fraxinus excelsior", "Morus nigra", "Olea europaea", "Rosmarinus officinalis"]
+  },
+  {
+    "nome": "Aesculus hippocastanum",
+    "parte": "gemme",
+    "indicazioni": ["Emorroidi", "Geloni", "Insufficienza venosa", "Varici", "Enfisema polmonare"],
+    "posologia": "40-50 gocce 3 volte al dì",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Castanea vesca", "Sorbus domestica", "Ginkgo biloba"]
+  },
+  {
+    "nome": "Ailanthus altissima",
+    "parte": "gemme florali",
+    "indicazioni": ["Tonsillite flemmonosa", "Parotite", "Faringotonsillite grave", "Sinusite purulenta"],
+    "posologia": "30-40 gocce 1-3 volte al dì",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Juglans regia", "Ribes nigrum", "Rosa canina"]
+  },
+  {
+    "nome": "Alnus glutinosa",
+    "parte": "gemme",
+    "indicazioni": ["Sclerosi cerebrale", "Flebiti", "Tromboflebiti", "Stati flogistici mucosali", "Orticaria", "Emicrania", "Ulcera gastro-duodenale"],
+    "posologia": "50-70 gocce 1-2 volte al dì",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Ficus carica", "Ribes nigrum", "Rosa canina", "Vaccinium myrtillus"]
+  },
+  {
+    "nome": "Alnus incana",
+    "parte": "gemme",
+    "indicazioni": ["Fibromi uterini", "Mastopatia fibrocistica", "Galattofugo", "Fibroadenoma mammario"],
+    "posologia": "30-50 gocce 1-2 volte al dì",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Rubus idaeus", "Ilex aquifolium", "Vaccinium vitis idaea"]
+  },
+  {
+    "nome": "Ampelopsis veitchii",
+    "parte": "giovani getti",
+    "indicazioni": ["Artrite deformante", "Artrosi", "Reumatismi cronici", "Periartrite", "Connettiviti autoimmuni"],
+    "posologia": "30-50 gocce 2-3 volte al dì; oppure 50-70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Betula verrucosa", "Buxus sempervirens", "Ribes nigrum", "Vitis vinifera"]
+  },
+  {
+    "nome": "Berberis vulgaris",
+    "parte": "scorza di radice",
+    "indicazioni": ["Litiasi renale", "Litiasi biliare", "Cistopielite", "Colecistopatie", "Drenante epatico e renale"],
+    "posologia": "30-50 gocce 1-3 volte al dì",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Juniperus communis", "Fraxinus excelsior", "Rosmarinus officinalis"]
+  },
+  {
+    "nome": "Betula pubescens",
+    "parte": "gemme",
+    "indicazioni": ["Decalcificazione", "Artrosi", "Demineralizzazione", "Rinofaringiti recidivanti", "Osteoporosi", "Stipsi"],
+    "posologia": "50 gocce 2 volte al dì; oppure 50-70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Non in allergia a Betulaceae",
+    "sinergie": ["Abies pectinata", "Ribes nigrum", "Rosa canina"]
+  },
+  {
+    "nome": "Betula verrucosa",
+    "parte": "gemme",
+    "indicazioni": ["Drenante generale", "Reumatismi", "Dismetabolie", "Osteoartrosi", "Decalcificazione", "Astenia convalescenza"],
+    "posologia": "50 gocce 2 volte al dì; oppure 50-70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Non in allergia a Betulaceae",
+    "sinergie": ["Abies pectinata", "Pinus montana", "Ribes nigrum"]
+  },
+  {
+    "nome": "Betula verrucosa",
+    "parte": "linfa",
+    "indicazioni": ["Drenante renale e articolare", "Artrosi", "Gotta", "Iperuricemia", "Cellulite", "Litiasi renale", "Edemi"],
+    "posologia": "50 gocce 2 volte al dì; oppure 50-70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Non in allergia a Betulaceae",
+    "sinergie": ["Fraxinus excelsior", "Castanea vesca", "Fagus sylvatica"]
+  },
+  {
+    "nome": "Betula verrucosa",
+    "parte": "semi",
+    "indicazioni": ["Tonico stimolante", "Affaticamento intellettuale", "Perdita memoria", "Astenia", "Depressione"],
+    "posologia": "50 gocce 2 volte al dì; oppure 50-70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Non in allergia a Betulaceae",
+    "sinergie": ["Ginkgo biloba", "Alnus glutinosa", "Sequoia gigantea"]
+  },
+  {
+    "nome": "Buxus sempervirens",
+    "parte": "giovani getti",
+    "indicazioni": ["Antiflogistico", "Aderenze post-infiammatorie", "Fibroialinosi", "Artrite", "Morbo di Dupuytren"],
+    "posologia": "30 gocce 2-3 volte al dì; oppure 50 gocce 1 volta al dì se in associazione. IMPORTANTE: max 40 giorni consecutivi",
+    "controindicazioni": "Non in gravidanza, allattamento, infanzia. Solo su prescrizione medica. Non oltre 40 giorni",
+    "sinergie": ["Ampelopsis veitchii", "Ribes nigrum", "Ilex aquifolium"]
+  },
+  {
+    "nome": "Calluna vulgaris",
+    "parte": "giovani getti",
+    "indicazioni": ["Cistiti acute e croniche", "Pielonefrite", "Colibacillosi", "Prostatite", "Uretriti"],
+    "posologia": "30-50 gocce 2-3 volte al dì",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Vaccinium vitis idaea", "Juniperus communis"]
+  },
+  {
+    "nome": "Carpinus betulus",
+    "parte": "gemme",
+    "indicazioni": ["Bronchite cronica", "Tracheite", "Faringite", "Rinite", "Sinusite", "Emostasi", "Coagulazione"],
+    "posologia": "40-50 gocce 2-3 volte al dì; oppure 50-70 gocce 1 volta al dì se in associazione. IMPORTANTE: max 6-8 settimane consecutive",
+    "controindicazioni": "Non oltre 6-8 settimane",
+    "sinergie": ["Ribes nigrum", "Alnus glutinosa", "Corylus avellana"]
+  },
+  {
+    "nome": "Castanea vesca",
+    "parte": "gemme",
+    "indicazioni": ["Insufficienza linfo-venosa arti inferiori", "Linfedemi", "Stasi linfatica", "Tosse", "Unghie fragili"],
+    "posologia": "50 gocce 2 volte al dì; oppure 50-70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Nessuna, può essere usato in gravidanza",
+    "sinergie": ["Sorbus domestica", "Aesculus hippocastanum", "Citrus limonum"]
+  },
+  {
+    "nome": "Cedrus libani",
+    "parte": "giovani getti",
+    "indicazioni": ["Dermatiti secche", "Eczema secco", "Psoriasi", "Prurito", "Seborrea", "Crosta lattea"],
+    "posologia": "30-50 gocce 2-3 volte al dì",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Juglans regia", "Ulmus campestris", "Ribes nigrum"]
+  },
+  {
+    "nome": "Cercis siliquastrum",
+    "parte": "gemme",
+    "indicazioni": ["Arteriti", "Tromboflebiti", "Arteriopatie obliteranti", "Sindrome di Buerger"],
+    "posologia": "50-70 gocce 1 volta al dì",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Cornus sanguinea", "Ginkgo biloba", "Prunus amygdalus"]
+  },
+  {
+    "nome": "Citrus limonum",
+    "parte": "scorza interna giovane ramo",
+    "indicazioni": ["Fluidificante sangue", "Iperuricemia", "Dislipidemia", "Litiasi biliare", "Nausea", "Dispepsia"],
+    "posologia": "50 gocce 2-3 volte al dì; oppure 70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Fraxinus excelsior", "Cornus sanguinea", "Olea europaea"]
+  },
+  {
+    "nome": "Cornus sanguinea",
+    "parte": "gemme",
+    "indicazioni": ["Angina pectoris", "Infarto miocardico", "Arteriosclerosi", "Ipertiroidismo", "Gozzo"],
+    "posologia": "50-70 gocce 1-2 volte al dì",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Crataegus oxyacantha", "Olea europaea", "Cercis siliquastrum"]
+  },
+  {
+    "nome": "Corylus avellana",
+    "parte": "gemme",
+    "indicazioni": ["Insufficienza epatica", "Epatite", "Cirrosi", "Bronchite cronica", "Enfisema", "Anemia"],
+    "posologia": "50 gocce 2 volte al dì; oppure 50-70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Juniperus communis", "Rosmarinus officinalis", "Carpinus betulus"]
+  },
+  {
+    "nome": "Crataegus oxyacantha",
+    "parte": "giovani getti",
+    "indicazioni": ["Cardiopatie funzionali", "Aritmie", "Tachicardia", "Palpitazioni", "Ipertensione", "Angina pectoris", "Insonnia"],
+    "posologia": "50 gocce 2-3 volte al dì; oppure 70-100 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Tilia tomentosa", "Olea europaea", "Viscum album"]
+  },
+  {
+    "nome": "Fagus sylvatica",
+    "parte": "gemme",
+    "indicazioni": ["Insufficienza renale", "Nefrite", "Nefroangiosclerosi", "Allergie", "Fibrosclerosi"],
+    "posologia": "50 gocce 2-3 volte al dì; oppure 70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Betula verrucosa", "Ilex aquifolium", "Ribes nigrum"]
+  },
+  {
+    "nome": "Ficus carica",
+    "parte": "gemme",
+    "indicazioni": ["Gastrite", "Ulcera gastroduodenale", "Colite", "Aerofagia", "Ansia", "Stress", "Insonnia"],
+    "posologia": "30-50 gocce prima pranzo/cena in gastrite-colite; oppure 70 gocce 1 volta al dì in ulcera. Può dare lieve diarrea iniziale",
+    "controindicazioni": "Ridurre dose se compare diarrea",
+    "sinergie": ["Alnus glutinosa", "Tilia tomentosa", "Ribes nigrum"]
+  },
+  {
+    "nome": "Fraxinus excelsior",
+    "parte": "gemme",
+    "indicazioni": ["Iperuricemia", "Gotta", "Ipercolesterolemia", "Tendiniti", "Artriti", "Obesità", "Edemi"],
+    "posologia": "40-50 gocce 2 volte al dì; oppure 70 gocce 1 volta al dì se in associazione. Cura: 40-60 giorni in iperuricemia",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Betula verrucosa linfa", "Acer campestre", "Juniperus communis"]
+  },
+  {
+    "nome": "Ginkgo biloba",
+    "parte": "gemme",
+    "indicazioni": ["Insufficienza cerebrale", "Demenza senile", "Alzheimer", "Acufeni", "Vertigini", "Claudicatio", "Impotenza"],
+    "posologia": "50 gocce 2 volte al dì; oppure 50-70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Alnus glutinosa", "Betula verrucosa semi", "Sequoia gigantea"]
+  },
+  {
+    "nome": "Hippophae rhamnoides",
+    "parte": "gemme e giovani getti",
+    "indicazioni": ["Deficit immunitari", "Immunostimolante", "Anemia", "Astenia", "Linfatismo"],
+    "posologia": "40-50 gocce 2 volte al dì; oppure 50-70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Abies pectinata", "Alnus glutinosa", "Rosa canina", "Vitis vinifera"]
+  },
+  {
+    "nome": "Ilex aquifolium",
+    "parte": "giovani getti",
+    "indicazioni": ["Febbre", "Nefroangiosclerosi", "Epilessia", "Acufeni", "Mastopatia fibrocistica"],
+    "posologia": "30 gocce 2-3 volte al dì; oppure 50 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "NON in gravidanza, allattamento, infanzia. Solo su prescrizione medica. Cautela con anticoagulanti",
+    "sinergie": ["Fagus sylvatica", "Tilia tomentosa", "Sorbus domestica"]
+  },
+  {
+    "nome": "Juglans regia",
+    "parte": "gemme",
+    "indicazioni": ["Diabete tipo II", "Pancreatite cronica", "Dermatiti infette", "Acne pustolosa", "Eczema", "Diarrea", "Linfatismo"],
+    "posologia": "50 gocce 2 volte al dì (pranzo/cena) in affezioni pancreatiche; oppure 70 gocce 1 volta al dì se in associazione. Cura: 2-3 mesi",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Ribes nigrum", "Ulmus campestris", "Vaccinium vitis idaea", "Morus nigra"]
+  },
+  {
+    "nome": "Juniperus communis",
+    "parte": "giovani getti",
+    "indicazioni": ["Cirrosi epatica", "Epatite", "Insufficienza renale", "Litiasi renale", "Prostatite", "Gotta"],
+    "posologia": "50 gocce 2-3 volte al dì; oppure 70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Rosmarinus officinalis", "Fraxinus excelsior", "Calluna vulgaris"]
+  },
+  {
+    "nome": "Ligustrum vulgare",
+    "parte": "giovani getti",
+    "indicazioni": ["Incanutimento precoce", "Acufeni", "Otosclerosi", "Ipoacusia", "Ipercolesterolemia", "Cellulite"],
+    "posologia": "50 gocce 2 volte al dì; oppure 50-70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Sequoia gigantea", "Sorbus domestica", "Ginkgo biloba"]
+  },
+  {
+    "nome": "Lonicera nigra",
+    "parte": "giovani getti",
+    "indicazioni": ["Tosse", "Tracheite", "Enterocolite cronica", "Colite spastica", "Splenomegalia"],
+    "posologia": "30-50 gocce 2-3 volte al dì",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Carpinus betulus", "Vaccinium myrtillus"]
+  },
+  {
+    "nome": "Morus nigra",
+    "parte": "gemme",
+    "indicazioni": ["Diabete tipo II", "Insufficienza pancreatica", "Iperglicemia", "Ernia iatale", "Retinopatia diabetica"],
+    "posologia": "50 gocce 2-3 volte al dì prima dei pasti; oppure 50-70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Juglans regia", "Olea europaea", "Vaccinium myrtillus"]
+  },
+  {
+    "nome": "Olea europaea",
+    "parte": "giovani getti",
+    "indicazioni": ["Ipertensione", "Ipercolesterolemia", "Diabete tipo II", "Arteriosclerosi", "Nevralgie"],
+    "posologia": "50-70 gocce 1-2 volte al dì",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Crataegus oxyacantha", "Prunus amygdalus", "Ginkgo biloba"]
+  },
+  {
+    "nome": "Pinus montana",
+    "parte": "gemme",
+    "indicazioni": ["Artrosi", "Artrosi vertebrale", "Osteoporosi", "Consolidamento fratture", "Reumatismo degenerativo"],
+    "posologia": "40-50 gocce 3 volte al dì; oppure 50-70 gocce 1 volta al dì se in associazione. Cura protratta per mesi",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Abies pectinata", "Ribes nigrum", "Vitis vinifera", "Rosa canina"]
+  },
+  {
+    "nome": "Platanus orientalis",
+    "parte": "gemme",
+    "indicazioni": ["Acne giovanile", "Acne rosacea", "Vitiligine", "Blefarite", "Calazio", "Prurito cutaneo"],
+    "posologia": "50-70 gocce 1 volta al dì",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Juglans regia", "Ulmus campestris", "Cedrus libani"]
+  },
+  {
+    "nome": "Populus nigra",
+    "parte": "gemme",
+    "indicazioni": ["Arteriopatia arti inferiori", "Claudicatio", "Bronchite cronica", "Prostatite", "Gotta"],
+    "posologia": "50 gocce 2 volte al dì; oppure 70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "L'uso prolungato può aumentare alfa-2-globuline",
+    "sinergie": ["Alnus glutinosa", "Ginkgo biloba", "Fraxinus excelsior"]
+  },
+  {
+    "nome": "Prunus amygdalus",
+    "parte": "gemme",
+    "indicazioni": ["Ipercolesterolemia", "Ipertrigliceridemia", "Ipertensione", "Arteriosclerosi"],
+    "posologia": "50-100 gocce 1 volta al dì",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Olea europaea", "Citrus limonum"]
+  },
+  {
+    "nome": "Prunus spinosa",
+    "parte": "gemme",
+    "indicazioni": ["Anoressia", "Astenia", "Convalescenze", "Ritardo crescita", "Deficit immunitario"],
+    "posologia": "30-50 gocce 1-3 volte al dì",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Rosa canina", "Hippophae rhamnoides", "Ribes nigrum"]
+  },
+  {
+    "nome": "Quercus peduncolata",
+    "parte": "gemme",
+    "indicazioni": ["Iposurrenalismo", "Astenia", "Ipotensione", "Senescenza precoce", "Stipsi", "Freddolosità"],
+    "posologia": "50-70 gocce 1-2 volte al dì",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Ribes nigrum", "Sequoia gigantea", "Betula pubescens"]
+  },
+  {
+    "nome": "Ribes nigrum",
+    "parte": "gemme",
+    "indicazioni": ["Allergie", "Asma", "Flogosi", "Iposurrenalismo", "Artrite", "Dermatiti", "Febbre"],
+    "posologia": "50 gocce 2-3 volte al dì; oppure 70-100-150 gocce 1 volta al mattino se in associazione. Stati allergici acuti: 100 gocce ogni ora. Tonsilliti adulto: 50-100 gocce 3-4 volte al dì. Sindromi febbrili virali: 100 gocce ogni 2-3 ore",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Praticamente tutti i gemmoderivati"]
+  },
+  {
+    "nome": "Rosa canina",
+    "parte": "giovani getti",
+    "indicazioni": ["Infezioni recidivanti", "Rinofaringiti", "Tonsilliti", "Otiti", "Immunostimolante", "Astenia"],
+    "posologia": "50 gocce 2-3 volte al dì; oppure 70 gocce 1 volta al dì se in associazione. Bambini: dosaggio ridotto",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Abies pectinata", "Ribes nigrum", "Betula pubescens"]
+  },
+  {
+    "nome": "Rosmarinus officinalis",
+    "parte": "giovani getti",
+    "indicazioni": ["Insufficienza epatica", "Colecistite", "Discinesia biliare", "Cirrosi", "Ipotensione", "Astenia"],
+    "posologia": "50 gocce 2 volte al dì; oppure 50-70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Juniperus communis", "Acer campestre", "Berberis vulgaris"]
+  },
+  {
+    "nome": "Rubus fructicosus",
+    "parte": "giovani getti",
+    "indicazioni": ["Osteoporosi", "Fibromi uterini", "Enfisema polmonare", "Dismetabolie"],
+    "posologia": "50 gocce 2-3 volte al dì; oppure 70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Vitis vinifera", "Sequoia gigantea", "Pinus montana"]
+  },
+  {
+    "nome": "Rubus idaeus",
+    "parte": "giovani getti",
+    "indicazioni": ["Dismenorrea", "Amenorrea", "Sindrome premestruale", "Menopausa", "Fibromi uterini", "Sterilità"],
+    "posologia": "50 gocce 2 volte al dì (mattino/sera); oppure 50-70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Salix alba amenti", "Viburnum lantana", "Vaccinium vitis idaea"]
+  },
+  {
+    "nome": "Salix alba",
+    "parte": "gemme",
+    "indicazioni": ["Insonnia", "Nevrosi", "Ansia", "Eretismo genitale", "Anemia"],
+    "posologia": "50 gocce 2 volte al dì; oppure 50-70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Tilia tomentosa", "Ficus carica"]
+  },
+  {
+    "nome": "Salix alba",
+    "parte": "scorza di stelo",
+    "indicazioni": ["Artrosi", "Reumatismo articolare", "Nevralgie", "Febbre", "Fibromialgie"],
+    "posologia": "50 gocce 2-3 volte al dì",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Ribes nigrum", "Ampelopsis veitchii"]
+  },
+  {
+    "nome": "Sequoia gigantea",
+    "parte": "giovani getti",
+    "indicazioni": ["Andropausa", "Ipertrofia prostatica", "Adenoma prostatico", "Menopausa", "Osteoporosi senile"],
+    "posologia": "50 gocce 2 volte al dì; oppure 50-70 gocce 1 volta al dì se in associazione. Ipertrofia prostatica: 50 gocce 1 volta al dì per cicli di 3 mesi",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Vaccinium vitis idaea", "Ribes nigrum", "Vitis vinifera"]
+  },
+  {
+    "nome": "Sorbus domestica",
+    "parte": "gemme",
+    "indicazioni": ["Insufficienza venosa", "Varici", "Gambe pesanti", "Emorroidi", "Acufeni", "Flebiti"],
+    "posologia": "50 gocce 2-3 volte al dì; oppure 70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Aesculus hippocastanum", "Castanea vesca", "Citrus limonum"]
+  },
+  {
+    "nome": "Tamarix gallica",
+    "parte": "gemme e giovani getti",
+    "indicazioni": ["Anemia", "Leucopenia", "Piastrinopenie", "Splenomegalia", "Mononucleosi"],
+    "posologia": "50 gocce 1 volta al dì; oppure 30-40 gocce 2-3 volte al dì. Piastrinopenie: 50-70 gocce 1 volta al dì",
+    "controindicazioni": "Limitare uso in aterosclerotici. NON in trombofilici, epatopatici cronici o con anticoagulanti",
+    "sinergie": ["Carpinus betulus", "Corylus avellana", "Ribes nigrum", "Vitis vinifera"]
+  },
+  {
+    "nome": "Tilia tomentosa",
+    "parte": "gemme",
+    "indicazioni": ["Insonnia", "Ansia", "Stress", "Tachicardia", "Spasmi", "Epilessia", "Nevrosi"],
+    "posologia": "50-70 gocce 1 o più volte al dì nell'adulto. Bambini: 10-30 gocce la sera. Ultima somministrazione: 1 ora prima di coricarsi",
+    "controindicazioni": "Nessuna. Indicato in pediatria, geriatria, gravidanza",
+    "sinergie": ["Crataegus oxyacantha", "Ficus carica", "Acer campestre"]
+  },
+  {
+    "nome": "Ulmus campestris",
+    "parte": "gemme",
+    "indicazioni": ["Acne pustolosa", "Dermatiti seborroiche", "Eczema", "Herpes", "Impetigine", "Gotta"],
+    "posologia": "50 gocce 2-3 volte al dì; oppure 70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Juglans regia", "Ribes nigrum", "Cedrus libani"]
+  },
+  {
+    "nome": "Vaccinium myrtillus",
+    "parte": "giovani getti",
+    "indicazioni": ["Retinopatia diabetica", "Fragilità capillare", "Diarrea", "Colite", "Cistite", "Insufficienza pancreatica"],
+    "posologia": "40-50 gocce 2-3 volte al dì; oppure 50-70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Juglans regia", "Morus nigra", "Vaccinium vitis idaea"]
+  },
+  {
+    "nome": "Vaccinium vitis idaea",
+    "parte": "giovani getti",
+    "indicazioni": ["Cistite cronica", "Colite", "Dismenorrea", "Menopausa", "Osteoporosi", "Prostatite"],
+    "posologia": "50 gocce 2-3 volte al dì; oppure 70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Calluna vulgaris", "Rubus idaeus", "Sequoia gigantea", "Vitis vinifera"]
+  },
+  {
+    "nome": "Viburnum lantana",
+    "parte": "gemme",
+    "indicazioni": ["Asma", "Dismenorrea", "Enfisema polmonare", "Spasmi bronchiali", "Otosclerosi"],
+    "posologia": "50 gocce 1 volta al dì; nell'asma con Ribes nigrum 50-70 gocce 1 volta al dì",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Ribes nigrum", "Corylus avellana", "Rosa canina"]
+  },
+  {
+    "nome": "Viscum album",
+    "parte": "giovani getti",
+    "indicazioni": ["Ipertensione", "Vertigini", "Epilessia", "Tumori (coadiuvante)", "Menorragia", "Nefrite"],
+    "posologia": "30-40 gocce 2 volte al dì; oppure 50-60 gocce 1 volta al dì se in associazione. Meglio usare 1CH per maggior sicurezza",
+    "controindicazioni": "NON in gravidanza/allattamento. Solo su prescrizione medica. Cautela con immunosoppressori, anticoagulanti, antipertensivi",
+    "sinergie": ["Crataegus oxyacantha", "Tilia tomentosa", "Ilex aquifolium"]
+  },
+  {
+    "nome": "Vitis vinifera",
+    "parte": "gemme",
+    "indicazioni": ["Artrosi deformante", "Artrite reumatoide", "Reumatismi cronici", "Fibromi uterini", "Osteoporosi", "Linfomi"],
+    "posologia": "50 gocce 2 volte al dì; oppure 50-70 gocce 1 volta al dì se in associazione",
+    "controindicazioni": "Nessuna",
+    "sinergie": ["Ampelopsis veitchii", "Pinus montana", "Ribes nigrum", "Rubus fructicosus"]
+  }
+];
+
+
+var PATOLOGIE = {
+  "ABORTO ABITUALE": ["Carpinus betulus (g)", "Rubus idaeus (gg)", "Viburnum lantana (g)"],
+  "ACNE GIOVANILE": ["Ficus carica (g)", "Juglans regia (g)", "Platanus orientalis (g)", "Prunus spinosa (g)", "Ulmus campestris (g)"],
+  "ACNE PUSTOLOSA": ["Juglans regia (g)", "Ulmus campestris (g)", "Vaccinium myrtillus (gg)"],
+  "ACNE ROSACEA": ["Platanus orientalis (g)", "Vitis vinifera (g)"],
+  "ACROCIANOSI": ["Aesculus hippocastanum (g)"],
+  "ACUFENI": ["Ginkgo biloba (g)", "Ilex aquifolium (gg)", "Ligustrum vulgare (gg)", "Sorbus domestica (g)", "Viburnum lantana (g)", "Viscum album (gg)"],
+  "ACUITA VISIVA": ["Ligustrum vulgare (gg)", "Ribes nigrum (g)", "Salix alba (l)", "Vaccinium myrtillus (gg)"],
+  "ADDISON": ["Quercus peduncolata (g)", "Ribes nigrum (g)"],
+  "ADENITE": ["Juglans regia (g)"],
+  "ADENOCARCINOMA": ["Buxus sempervirens (gg)", "Celastrus scandens (gg,gr,sr)", "Viscum album (gg)"],
+  "ADENOIDITE": ["Abies pectinata (g)", "Betula pubescens (g)", "Juglans regia (g)"],
+  "ADENOMA PROSTATICO": ["Ribes nigrum (g)", "Sequoia gigantea (gg)", "Vaccinium vitis idaea (gg)"],
+  "AEROFAGIA": ["Ficus carica (g)", "Tilia tomentosa (g)"],
+  "AFONIA": ["Carpinus betulus (g)"],
+  "AFTA": ["Juglans regia (g)", "Vaccinium myrtillus (gg)"],
+  "ALBUMINURIA": ["Betula pubescens (g,sr)", "Betula verrucosa (l)", "Fagus sylvatica (g)"],
+  "ALLERGIE": ["Alnus glutinosa (g)", "Fagus sylvatica (g)", "Ficus carica (g)", "Ribes nigrum (g)", "Rosa canina (gg)", "Viburnum lantana (g)"],
+  "ALOPECIA": ["Betula pubescens (gr)", "Buxus sempervirens (gg)", "Castanea vesca (g)", "Rosmarinus officinalis (gg)", "Thuya orientalis (gg)"],
+  "ALZHEIMER": ["Alnus glutinosa (g)", "Betula verrucosa (s)", "Ginkgo biloba (g)", "Sequoia gigantea (gg)"],
+  "AMENORREA": ["Ficus carica (g)", "Prunus persica (s)", "Rosmarinus officinalis (gg)", "Rubus idaeus (gg)", "Salix alba (a)"],
+  "AMILOIDOSI": ["Calluna vulgaris (gg)", "Fagus sylvatica (g)"],
+  "AMNESIA": ["Betula verrucosa (s)", "Ginkgo biloba (g)", "Prunus amygdalus (g)"],
+  "ANAFRODISIA": ["Betula pubescens (a)", "Fraxinus excelsior (s)", "Ginkgo biloba (g)", "Quercus peduncolata (a)", "Rosmarinus officinalis (gg)", "Sequoia gigantea (gg)"],
+  "ANDROPAUSA": ["Betula pubescens (a)", "Quercus peduncolata (a,g)", "Rosmarinus officinalis (gg)", "Sequoia gigantea (gg)"],
+  "ANEMIA": ["Abies pectinata (g)", "Corylus avellana (g)", "Prunus spinosa (g)", "Rosa canina (gg)", "Salix alba (g)", "Tamarix gallica (gg)"],
+  "ANGINA PECTORIS": ["Cornus sanguinea (g)", "Crataegus oxyacantha (gg)", "Olea europaea (gg)", "Prunus amygdalus (sr)", "Prunus spinosa (g)", "Syringa vulgaris (g)"],
+  "ANGINA TONSILLITE": ["Ailanthus altissima (gf)", "Juglans regia (g)", "Ligustrum vulgare (gg)", "Rosa canina (gg)", "Rubus fructicosus (gg)", "Vitis vinifera (g)"],
+  "ANSIA": ["Crataegus oxyacantha (gg)", "Ficus carica (g)", "Tilia tomentosa (g)"],
+  "ARITMIE": ["Crataegus oxyacantha (gg)", "Tilia tomentosa (g)"],
+  "ARTERIOSCLEROSI": ["Alnus glutinosa (g)", "Citrus limonum (ss)", "Cornus sanguinea (g)", "Ginkgo biloba (g)", "Olea europaea (gg)"],
+  "ARTERITE": ["Cercis siliquastrum (g)", "Cornus sanguinea (g)", "Olea europaea (gg)", "Ribes nigrum (g)"],
+  "ARTRITE REUMATOIDE": ["Ampelopsis veitchii (gg)", "Betula verrucosa (l)", "Pinus montana (g)", "Ribes nigrum (g)", "Vitis vinifera (g)"],
+  "ARTROSI": ["Ampelopsis veitchii (gg)", "Betula pubescens (g)", "Pinus montana (g)", "Ribes nigrum (g)", "Rosa canina (gg)", "Vitis vinifera (g)"],
+  "ARTROSI CERVICALE": ["Pinus montana (g)", "Ribes nigrum (g)", "Vitis vinifera (g)"],
+  "ASMA BRONCHIALE": ["Corylus avellana (g)", "Ribes nigrum (g)", "Viburnum lantana (g)"],
+  "ASTENIA": ["Betula pubescens (g)", "Betula verrucosa (s)", "Prunus spinosa (g)", "Quercus peduncolata (gh)", "Ribes nigrum (g)"],
+  "BALANOPOSTITE": ["Juglans regia (g)", "Ulmus campestris (g)"],
+  "BLEFARITE": ["Juglans regia (g)", "Platanus orientalis (g)"],
+  "BORSITE": ["Ampelopsis veitchii (gg)", "Betula verrucosa (l)", "Ribes nigrum (g)"],
+  "BRONCHITE ACUTA": ["Alnus glutinosa (g)", "Carpinus betulus (g)", "Ribes nigrum (g)"],
+  "BRONCHITE ASMATICA": ["Ribes nigrum (g)", "Viburnum lantana (g)"],
+  "BRONCHITE CRONICA": ["Carpinus betulus (g)", "Corylus avellana (g)", "Ribes nigrum (g)"],
+  "BUERGER": ["Cercis siliquastrum (g)", "Citrus limonum (ss)", "Cornus sanguinea (g)", "Ginkgo biloba (g)"],
+  "BULIMIA": ["Ficus carica (g)", "Tilia tomentosa (g)"],
+  "CALAZIO": ["Ficus carica (g)", "Platanus orientalis (g)"],
+  "CALVIZIE": ["Betula pubescens (gr)", "Castanea vesca (g)", "Rosmarinus officinalis (gg)"],
+  "CANDIDOSI ORALE": ["Buxus sempervirens (gg)", "Ligustrum vulgare (gg)", "Rubus fructicosus (gg)"],
+  "CAPILLARI FRAGILITA": ["Aesculus hippocastanum (g)", "Castanea vesca (g)", "Ginkgo biloba (g)", "Quercus peduncolata (gr,sr)", "Rosa canina (gg)", "Vaccinium myrtillus (gg)"],
+  "CATARATTA": ["Betula pubescens (g)", "Ginkgo biloba (g)", "Juglans regia (g)", "Salix alba (l)"],
+  "CEFALEA": ["Alnus glutinosa (g)", "Ribes nigrum (g)", "Rosa canina (gg)", "Tilia tomentosa (g)"],
+  "CEFALEA BILIARE": ["Juglans regia (g)", "Rosmarinus officinalis (gg)"],
+  "CEFALEA VASOMOTORIA": ["Alnus glutinosa (g)", "Ribes nigrum (g)", "Rosa canina (gg)", "Tilia tomentosa (g)"],
+  "CELLULITE": ["Betula verrucosa (l)", "Castanea vesca (g)", "Fagus sylvatica (g)", "Fraxinus excelsior (g)", "Ligustrum vulgare (gg)"],
+  "CERVICITE": ["Juglans regia (g)", "Quercus peduncolata (gh,gr)", "Ulmus campestris (g)"],
+  "CHERATOSI": ["Calluna vulgaris (gg)", "Cedrus libani (gg)"],
+  "CHINETOSI": ["Ficus carica (g)", "Tilia tomentosa (g)"],
+  "CIRROSI EPATICA": ["Corylus avellana (g)", "Juniperus communis (gg)", "Rosmarinus officinalis (gg)"],
+  "CISTI OVARICHE": ["Buxus sempervirens (gg)", "Ribes nigrum (g)", "Rubus idaeus (gg)", "Salix alba (a)"],
+  "CISTITE ACUTA": ["Calluna vulgaris (gg)", "Vaccinium vitis idaea (gg)"],
+  "CISTITE CRONICA": ["Calluna vulgaris (gg)", "Vaccinium myrtillus (gg)", "Vaccinium vitis idaea (gg)"],
+  "CITOMEGALOVIRUS": ["Juniperus communis (gg)"],
+  "CLAUDICATIO": ["Cercis siliquastrum (g)", "Ginkgo biloba (g)", "Populus nigra (g)"],
+  "COLANGITE": ["Rosmarinus officinalis (gg)"],
+  "COLECISTITE": ["Rosmarinus officinalis (gg)"],
+  "COLESTEROLO": ["Betula pubescens (gr,sr)", "Citrus limonum (g)", "Fraxinus excelsior (g)", "Olea europaea (gg)", "Prunus amygdalus (g)"],
+  "COLICA": ["Ficus carica (g)", "Tilia tomentosa (g)"],
+  "COLITE": ["Ficus carica (g)", "Juglans regia (g)", "Vaccinium myrtillus (gg)", "Vaccinium vitis idaea (gg)"],
+  "COLITE SPASTICA": ["Ficus carica (g)", "Tilia tomentosa (g)"],
+  "CONGIUNTIVITE": ["Juglans regia (g)", "Ribes nigrum (g)", "Rosa canina (gg)"],
+  "COUPEROSE": ["Aesculus hippocastanum (g)", "Platanus orientalis (g)"],
+  "CRAMPI": ["Castanea vesca (g)", "Citrus limonum (ss)", "Tilia tomentosa (g)"],
+  "CRESCITA RITARDO": ["Abies pectinata (g)", "Betula pubescens (g)", "Pinus montana (g)", "Quercus peduncolata (g)", "Rosa canina (gg)"],
+  "CROHN": ["Ficus carica (g)", "Ribes nigrum (g)", "Rubus fructicosus (gg)", "Vitis vinifera (r)"],
+  "CROSTA LATTEA": ["Cedrus libani (gg)", "Juglans regia (g)", "Ulmus campestris (g)"],
+  "DEBILITAZIONE": ["Betula verrucosa (s)", "Prunus spinosa (g)", "Quercus peduncolata (gh)"],
+  "DECALCIFICAZIONE": ["Abies pectinata (g)", "Pinus montana (g)", "Quercus peduncolata (g)"],
+  "DEMINERALIZZAZIONE": ["Abies pectinata (g)", "Betula pubescens (g)", "Pinus montana (g)"],
+  "DEMENZA SENILE": ["Alnus glutinosa (g)", "Ginkgo biloba (g)", "Olea europaea (gg)"],
+  "DEPRESSIONE": ["Betula verrucosa (s)", "Ficus carica (g)", "Tilia tomentosa (g)"],
+  "DERMATITE": ["Cedrus libani (gg)", "Juglans regia (g)", "Platanus orientalis (g)", "Ribes nigrum (g)", "Ulmus campestris (g)"],
+  "DIABETE TIPO II": ["Juglans regia (g)", "Morus nigra (g)", "Olea europaea (gg)", "Vaccinium myrtillus (gg)"],
+  "DIARREA": ["Juglans regia (g)", "Vaccinium myrtillus (gg)"],
+  "DISIDROSI": ["Cedrus libani (gg)", "Juglans regia (g)"],
+  "DISLIPIDEMIE": ["Olea europaea (gg)", "Prunus amygdalus (g)", "Rosmarinus officinalis (gg)"],
+  "DISMENORREA": ["Rubus idaeus (gg)", "Salix alba (a)", "Tilia tomentosa (g)", "Viburnum lantana (g)"],
+  "DISPEPSIA": ["Citrus limonum (g)", "Ficus carica (g)", "Juniperus communis (gg)"],
+  "DISPNEA": ["Crataegus oxyacantha (gg)", "Viburnum lantana (g)"],
+  "DUPUYTREN": ["Ampelopsis veitchii (gg)", "Buxus sempervirens (gg)", "Ribes nigrum (g)"],
+  "ECZEMA": ["Cedrus libani (gg)", "Juglans regia (g)", "Ribes nigrum (g)", "Ulmus campestris (g)"],
+  "EDEMA": ["Alnus glutinosa (g)", "Betula pubescens (sr)", "Betula verrucosa (l)", "Castanea vesca (g)", "Morus nigra (sr)", "Ribes nigrum (g)"],
+  "EDEMA QUINCKE": ["Ribes nigrum (g)", "Rosa canina (gg)"],
+  "EMATEMESI": ["Sanguisorba officinalis (gr)", "Thuya orientalis (gg)"],
+  "EMATOMA": ["Cornus sanguinea (g)", "Ficus carica (g)"],
+  "EMATURIA": ["Sanguisorba officinalis (gr)"],
+  "EMBOLIA": ["Cercis siliquastrum (g)", "Citrus limonum (sr)", "Cornus sanguinea (g)"],
+  "EMERALOPIA": ["Ribes nigrum (g)", "Vaccinium myrtillus (gg)"],
+  "EMICRANIA": ["Alnus glutinosa (g)", "Ribes nigrum (g)", "Rosa canina (gg)", "Tilia tomentosa (g)"],
+  "EMOFILIA": ["Carpinus betulus (g)", "Sanguisorba officinalis (gr)", "Thuya orientalis (gg)"],
+  "EMORRAGIA": ["Carpinus betulus (g)", "Quercus peduncolata (gr,sr)", "Sanguisorba officinalis (gr)", "Thuya orientalis (gg)"],
+  "EMORROIDI": ["Aesculus hippocastanum (g)", "Sorbus domestica (g)"],
+  "EMOTTISI": ["Sanguisorba officinalis (gr)"],
+  "ENFISEMA POLMONARE": ["Corylus avellana (g)", "Viburnum lantana (g)"],
+  "ENTEROCOLITE": ["Ficus carica (g)", "Juglans regia (g)", "Vaccinium myrtillus (gg)"],
+  "EPATITE": ["Corylus avellana (g)", "Juniperus communis (gg)", "Rosmarinus officinalis (gg)", "Secale cereale (gr)"],
+  "EPILESSIA": ["Ficus carica (g)", "Tilia tomentosa (g)", "Viscum album (gg)"],
+  "EPISTASSI": ["Aesculus hippocastanum (g)", "Carpinus betulus (g)", "Sanguisorba officinalis (gr)", "Thuya orientalis (gg)"],
+  "ERITEMA": ["Ficus carica (g)", "Ribes nigrum (g)"],
+  "ERNIA IATALE": ["Ficus carica (g)", "Morus nigra (g)", "Tilia tomentosa (g)"],
+  "FARINGITE": ["Ailanthus altissima (gf)", "Carpinus betulus (g)", "Ligustrum vulgare (gg)"],
+  "FEBBRE": ["Abies pectinata (g)", "Alnus glutinosa (g)", "Betula pubescens (g)", "Ribes nigrum (gg)", "Salix alba (ss)"],
+  "FERITE": ["Lonicera nigra (gg)", "Sanguisorba officinalis (sr)"],
+  "FIBROADENOMA": ["Alnus incana (g)", "Buxus sempervirens (gg)", "Ilex aquifolium (gg)", "Rubus idaeus (gg)", "Vaccinium vitis idaea (gg)"],
+  "FIBROMI UTERINI": ["Alnus incana (g)", "Fraxinus excelsior (g)", "Ribes nigrum (g)", "Rubus fructicosus (gg)", "Rubus idaeus (gg)", "Sequoia gigantea (gg)", "Vaccinium vitis idaea (gg)"],
+  "FIBROSCLEROSI": ["Fagus sylvatica (g)", "Rubus fructicosus (gg)"],
+  "FIBROSITE": ["Ampelopsis veitchii (gg)", "Betula verrucosa (l)", "Buxus sempervirens (gg)", "Ribes nigrum (g)"],
+  "FLATULENZA": ["Ficus carica (g)", "Juglans regia (g)"],
+  "FLOGOSI": ["Alnus incana (g)", "Buxus sempervirens (gg)", "Carpinus betulus (g)", "Juglans regia (g)", "Ribes nigrum (g)", "Rosa canina (gg)", "Vitis vinifera (g)"],
+  "FORUNCOLOSI": ["Ficus carica (g)", "Juglans regia (g)", "Prunus spinosa (g)", "Ulmus campestris (g)"],
+  "FRATTURE": ["Abies pectinata (g)", "Pinus montana (g)", "Quercus peduncolata (g)", "Sequoia gigantea (gg)"],
+  "FREDDOLOSITA": ["Abies pectinata (g)", "Quercus peduncolata (g)", "Ribes nigrum (g)", "Rosa canina (gg)"],
+  "FRIGIDITA": ["Betula pubescens (a)", "Quercus peduncolata (g)", "Rosmarinus officinalis (gg)", "Rubus idaeus (gg)"],
+  "GALATTOFUGO": ["Alnus glutinosa (g)", "Alnus incana (g)"],
+  "GAMBE PESANTI": ["Sorbus domestica (g)"],
+  "GASTRALGIA": ["Ficus carica (g)", "Tilia tomentosa (g)"],
+  "GASTRITE": ["Ficus carica (g)", "Ribes nigrum (g)", "Tilia tomentosa (g)"],
+  "GASTRODUODENITE": ["Ficus carica (g)", "Vaccinium myrtillus (gg)"],
+  "GELONI": ["Aesculus hippocastanum (g)", "Juglans regia (g)"],
+  "GENGIVITE": ["Abies pectinata (g)", "Betula pubescens (g)", "Juglans regia (g)", "Quercus peduncolata (g)"],
+  "GENGIVOSTOMATITE": ["Abies pectinata (g)", "Alnus glutinosa (g)", "Betula pubescens (g)", "Quercus peduncolata (g)", "Ribes nigrum (g)", "Vaccinium myrtillus (gg)"],
+  "GLAUCOMA": ["Prunus spinosa (g)", "Tilia tomentosa (g)"],
+  "GONARTROSI": ["Betula pubescens (g)", "Pinus montana (g)", "Ribes nigrum (g)", "Rosa canina (gg)", "Rubus fructicosus (gg)", "Vitis vinifera (g)"],
+  "GOTTA": ["Betula pubescens (sr)", "Betula verrucosa (l)", "Buxus sempervirens (gg)", "Fraxinus excelsior (g)", "Juniperus communis (gg)", "Populus nigra (g)", "Ribes nigrum (g)", "Ulmus campestris (g)", "Vaccinium myrtillus (gg)", "Vaccinium vitis idaea (gg)"],
+  "GOZZO": ["Cornus sanguinea (g)", "Rosa canina (gg)"],
+  "GRANULOMA": ["Abies pectinata (g)", "Ficus carica (g)", "Juglans regia (g)", "Tamarix gallica (gg)"],
+  "HERPES": ["Acer campestre (g)", "Juglans regia (g)", "Rosa canina (gg)", "Ulmus campestris (g)"],
+  "HORTON": ["Cercis siliquastrum (g)", "Cornus sanguinea (g)", "Olea europaea (gg)", "Ribes nigrum (g)"],
+  "ICTUS": ["Acer campestre (g)", "Alnus glutinosa (g)", "Citrus limonum (ss)", "Ginkgo biloba (g)", "Prunus amygdalus (sr)", "Viscum album (gg)"],
+  "IDROPISIA": ["Betula pubescens (sr)", "Betula verrucosa (l)", "Prunus spinosa (g)"],
+  "IDROSADENITE": ["Juglans regia (g)", "Ulmus campestris (g)"],
+  "IMMUNODEFICIENZA": ["Hippophae rhamnoides (g)", "Prunus spinosa (g)", "Rosa canina (gg)", "Vitis vinifera (g)"],
+  "IMPETIGINE": ["Juglans regia (g)", "Ulmus campestris (g)"],
+  "IMPOTENZA": ["Betula pubescens (a)", "Betula verrucosa (s)", "Fraxinus excelsior (s)", "Ginkgo biloba (g)", "Quercus peduncolata (a,gh)", "Rosmarinus officinalis (gg)", "Sequoia gigantea (gg)"],
+  "INAPPETENZA": ["Citrus limonum (g)"],
+  "INCANUTIMENTO": ["Ligustrum vulgare (gg)", "Sequoia gigantea (gg)"],
+  "INCONTINENZA URINARIA": ["Quercus peduncolata (g)", "Vaccinium myrtillus (gg)"],
+  "INDIGESTIONE": ["Citrus limonum (g)"],
+  "INFEZIONI": ["Ribes nigrum (g)", "Rosa canina (gg)", "Vitis vinifera (g)"],
+  "INFARTO MIOCARDICO": ["Alnus glutinosa (g)", "Cornus sanguinea (g)", "Crataegus oxyacantha (gg)", "Zea mays (gr)"],
+  "INSONNIA": ["Crataegus oxyacantha (gg)", "Ficus carica (g)", "Salix alba (g)", "Tilia tomentosa (g)"],
+  "INSUFFICIENZA CARDIACA": ["Betula pubescens (sr)", "Crataegus oxyacantha (gg)", "Prunus spinosa (g)"],
+  "INSUFFICIENZA EPATICA": ["Alnus incana (g)", "Carpinus betulus (g)", "Corylus avellana (g)", "Juniperus communis (gg)", "Rosmarinus officinalis (gg)", "Secale cereale (gr)"],
+  "INSUFFICIENZA PANCREATICA": ["Juglans regia (g)", "Morus nigra (g)", "Vaccinium myrtillus (gg)", "Vaccinium vitis idaea (gg)", "Vitis vinifera (gr)"],
+  "INSUFFICIENZA RENALE": ["Betula pubescens (sr)", "Betula verrucosa (l)", "Fagus sylvatica (g)", "Fraxinus excelsior (g)", "Ilex aquifolium (gg)", "Juniperus communis (gg)"],
+  "INSUFFICIENZA RESPIRATORIA": ["Aesculus hippocastanum (g)", "Corylus avellana (g)", "Rubus fructicosus (gg)"],
+  "INSUFFICIENZA SURRENALICA": ["Ilex aquifolium (gg)", "Prunus spinosa (g)", "Quercus peduncolata (g)", "Ribes nigrum (g)"],
+  "INSUFFICIENZA TESTICOLARE": ["Betula pubescens (a)", "Fraxinus excelsior (s)", "Quercus peduncolata (a)"],
+  "INSUFFICIENZA VENOSA": ["Aesculus hippocastanum (g)", "Castanea vesca (g)", "Ginkgo biloba (g)", "Sorbus domestica (g)"],
+  "IPERCOAGULABILITA": ["Cercis siliquastrum (g)", "Citrus limonum (sr)", "Cornus sanguinea (g)", "Prunus amygdalus (sr)"],
+  "IPERCOLESTEROLEMIA": ["Betula pubescens (gr,sr)", "Betula verrucosa (l)", "Citrus limonum (g)", "Fraxinus excelsior (g)", "Juniperus communis (gg)", "Ligustrum vulgare (gg)", "Olea europaea (gg)", "Prunus amygdalus (g)", "Rosmarinus officinalis (gg)", "Tamarix gallica (gg)"],
+  "IPERFIBRINOGENEMIA": ["Citrus limonum (ss)", "Cornus sanguinea (g)", "Prunus amygdalus (sr)"],
+  "IPERTENSIONE": ["Crataegus oxyacantha (gg)", "Olea europaea (gg)", "Prunus amygdalus (g)", "Rubus fructicosus (gg)", "Sorbus domestica (g)", "Tilia tomentosa (g)", "Vaccinium vitis idaea (gg)", "Viscum album (gg)"],
+  "IPERURICEMIA": ["Berberis vulgaris (sr)", "Betula pubescens (gr,sr)", "Betula verrucosa (l)", "Buxus sempervirens (gg)", "Citrus limonum (g)", "Corylus avellana (g)", "Fraxinus excelsior (g)", "Populus nigra (g)", "Rosmarinus officinalis (gg)", "Salix alba (ss)", "Ulmus campestris (g)", "Vaccinium myrtillus (gg)"],
+  "IPOACUSIA": ["Ginkgo biloba (g)", "Ilex aquifolium (gg)", "Sorbus domestica (g)"],
+  "IPOGONADISMO": ["Betula pubescens (a)", "Quercus peduncolata (a)", "Sequoia gigantea (gg)"],
+  "IPOSURRENALISMO": ["Ilex aquifolium (gg)", "Prunus spinosa (g)", "Quercus peduncolata (g)", "Ribes nigrum (g)"],
+  "IPOTIROIDISMO": ["Cornus sanguinea (g)"],
+  "IPOTENSIONE": ["Ribes nigrum (g)", "Rosmarinus officinalis (gg)"],
+  "ITTERO": ["Juniperus communis (gg)", "Rosmarinus officinalis (gg)", "Secale cereale (gr)"],
+  "LARINGITE": ["Betula verrucosa (g)", "Carpinus betulus (g)", "Lonicera nigra (gg)", "Ribes nigrum (g)", "Rosa canina (gg)"],
+  "LEUCOCITOSI": ["Vitis vinifera (g)"],
+  "LEUCOPENIA": ["Tamarix gallica (gg)"],
+  "LEUCORREA": ["Ailanthus altissima (sr)", "Alnus glutinosa (g)", "Calluna vulgaris (gg)", "Juglans regia (g)", "Ligustrum vulgare (gg)", "Quercus peduncolata (gh,gr)", "Ulmus campestris (g)"],
+  "LIBIDO DISTURBI": ["Betula pubescens (a)", "Fraxinus excelsior (s)", "Ginkgo biloba (g)", "Quercus peduncolata (a,g)", "Rosmarinus officinalis (gg)", "Rubus idaeus (gg)", "Salix alba (a)", "Sequoia gigantea (gg)"],
+  "LICHEN": ["Cedrus libani (gg)", "Juglans regia (g)"],
+  "LINFANGITE": ["Abies pectinata (g)", "Juglans regia (g)"],
+  "LINFATISMO": ["Abies pectinata (g)", "Juglans regia (g)", "Quercus peduncolata (g)", "Vitis vinifera (g)"],
+  "LINFEDEMA": ["Betula verrucosa (l)", "Castanea vesca (g)", "Ligustrum vulgare (gg)", "Lonicera nigra (gg)"],
+  "LINFOADENOMEGALIA": ["Buxus sempervirens (gg)", "Juglans regia (g)", "Vitis vinifera (g)"],
+  "LINFOCITOSI": ["Juglans regia (g)", "Tamarix gallica (gg)", "Vitis vinifera (g)"],
+  "LINFOMA": ["Juglans regia (g)", "Vitis vinifera (g)"],
+  "LIPOTIMIA": ["Crataegus oxyacantha (gg)", "Tilia tomentosa (g)"],
+  "LITIASI BILIARE": ["Acer campestre (g)", "Berberis vulgaris (sr)", "Citrus limonum (g)", "Fraxinus excelsior (g)", "Rosmarinus officinalis (gg)"],
+  "LITIASI RENALE": ["Berberis vulgaris (sr)", "Betula verrucosa (l)", "Calluna vulgaris (gg)", "Citrus limonum (g)", "Fagus sylvatica (g)", "Juniperus communis (gg)", "Rubus idaeus (gg)"],
+  "LOMBAGINE": ["Aesculus hippocastanum (g)", "Betula verrucosa (g)", "Berberis vulgaris (sr)", "Pinus montana (g)", "Rubus fructicosus (gg)", "Vaccinium vitis idaea (gg)"],
+  "LUPUS": ["Ribes nigrum (g)"],
+  "MACROGLOBULINEMIA": ["Carpinus betulus (g)"],
+  "MAGREZZA": ["Betula pubescens (g)", "Prunus spinosa (g)"],
+  "MASTALGIA": ["Alnus incana (g)", "Juniperus communis (gg)", "Vaccinium vitis idaea (gg)"],
+  "MASTITE": ["Alnus incana (g)", "Juniperus communis (gg)", "Vaccinium vitis idaea (gg)"],
+  "MASTODINIA": ["Alnus incana (g)", "Juniperus communis (gg)", "Vaccinium vitis idaea (gg)"],
+  "MASTOPATIA": ["Alnus incana (g)", "Betula verrucosa (g)", "Buxus sempervirens (gg)", "Ilex aquifolium (gg)", "Juniperus communis (gg)", "Rubus idaeus (gg)", "Vaccinium vitis idaea (gg)"],
+  "MELENA": ["Ailanthus altissima (sr)", "Carpinus betulus (g)", "Sanguisorba officinalis (gr)", "Thuya orientalis (gg)"],
+  "MEMORIA DISTURBI": ["Betula verrucosa (s)", "Ginkgo biloba (g)", "Prunus amygdalus (g)", "Rosmarinus officinalis (gg)"],
+  "MENARCA RITARDO": ["Betula pubescens (g)", "Prunus spinosa (g)"],
+  "MENIERE": ["Ginkgo biloba (g)", "Sorbus domestica (g)"],
+  "MENORRAGIA": ["Ailanthus altissima (sr)", "Quercus peduncolata (gr,sr)", "Rubus idaeus (gg)", "Thuya orientalis (gg)", "Viscum album (gg)", "Vitis vinifera (g)"],
+  "MENOPAUSA": ["Quercus peduncolata (a)", "Rosmarinus officinalis (gg)", "Rubus idaeus (gg)", "Sequoia gigantea (gg)", "Sorbus domestica (g)", "Vaccinium vitis idaea (gg)", "Viscum album (gg)"],
+  "METEORISMO": ["Ficus carica (g)", "Juglans regia (g)", "Prunus persica (s)", "Prunus spinosa (g)", "Sanguisorba officinalis (gr)", "Vaccinium vitis idaea (gg)"],
+  "METRITE": ["Juglans regia (g)", "Quercus peduncolata (gh,gr)", "Rubus idaeus (gg)"],
+  "METRORRAGIA": ["Ailanthus altissima (sr)", "Quercus peduncolata (gh,gr,sr)", "Sanguisorba officinalis (gr)", "Thuya orientalis (gg)"],
+  "MIALGIE": ["Salix alba (ss)", "Tilia tomentosa (g)"],
+  "MICOSI": ["Juglans regia (g)"],
+  "MIELOMA": ["Carpinus betulus (g)"],
+  "MIOCARDIOANGIOSCLEROSI": ["Alnus glutinosa (g)", "Citrus limonum (ss)", "Cornus sanguinea (g)", "Crataegus oxyacantha (gg)", "Syringa vulgaris (g)", "Zea mays (gr)"],
+  "MIOCARDITE": ["Crataegus oxyacantha (gg)"],
+  "MIODESOPSIE": ["Salix alba (l)", "Vaccinium myrtillus (gg)"],
+  "MIOPIA": ["Ribes nigrum (g)", "Salix alba (l)", "Vaccinium myrtillus (gg)"],
+  "MONONUCLEOSI": ["Alnus glutinosa (g)", "Betula pubescens (g)", "Juglans regia (g)", "Juniperus communis (gg)", "Ribes nigrum (g)", "Tamarix gallica (gg)", "Vitis vinifera (g)"],
+  "NAUSEA": ["Citrus limonum (g)", "Ficus carica (g)"],
+  "NEFRITE": ["Betula verrucosa (g)", "Fagus sylvatica (g)", "Ribes nigrum (g)", "Rubus fructicosus (gg)", "Viscum album (gg)"],
+  "NEFROANGIOSCLEROSI": ["Fagus sylvatica (g)", "Ilex aquifolium (gg)", "Vaccinium vitis idaea (gg)"],
+  "NEFROSI": ["Betula pubescens (g,sr)", "Betula verrucosa (l)", "Fagus sylvatica (g)", "Ilex aquifolium (gg)", "Juniperus communis (gg)"],
+  "NEVRALGIE": ["Acer campestre (g)", "Ficus carica (g)", "Ribes nigrum (g)", "Salix alba (ss)", "Tilia tomentosa (g)"],
+  "NEVRASTENIA": ["Betula verrucosa (s)", "Tilia tomentosa (g)"],
+  "NEVROSI": ["Ficus carica (g)", "Salix alba (g)", "Tilia tomentosa (g)"],
+  "OBESITA": ["Betula verrucosa (l)", "Fraxinus excelsior (g)"],
+  "ORTICARIA": ["Alnus glutinosa (g)", "Ribes nigrum (g)", "Rosa canina (gg)"],
+  "OSTEOPOROSI": ["Abies pectinata (g)", "Betula pubescens (g)", "Pinus montana (g)", "Sequoia gigantea (gg)", "Vitis vinifera (g)"],
+  "OTITE": ["Alnus glutinosa (g)", "Betula pubescens (g)", "Rosa canina (gg)"],
+  "OTOSCLEROSI": ["Ginkgo biloba (g)", "Ilex aquifolium (gg)", "Sorbus domestica (g)", "Viburnum lantana (g)"],
+  "OVAIO DISTURBI": ["Rubus idaeus (gg)", "Salix alba (a)", "Vaccinium vitis idaea (gg)"],
+  "PALPITAZIONI": ["Crataegus oxyacantha (g)", "Tilia tomentosa (g)"],
+  "PANCREATITE CRONICA": ["Juglans regia (g)", "Morus nigra (g)", "Ribes nigrum (g)"],
+  "PARADONTOSI": ["Abies pectinata (g)", "Betula pubescens (g)", "Quercus peduncolata (g)"],
+  "PARAFLEBITE": ["Alnus glutinosa (g)", "Sorbus domestica (g)"],
+  "PARALISI": ["Acer campestre (g)", "Rosmarinus officinalis (gg)"],
+  "PARESTESIE": ["Castanea vesca (g)", "Sorbus domestica (g)"],
+  "PARKINSON": ["Alnus glutinosa (g)", "Ginkgo biloba (g)"],
+  "PAROTITE": ["Ailanthus altissima (gf)", "Juglans regia (g)", "Ribes nigrum (g)"],
+  "PATERECCIO": ["Ficus carica (g)", "Juglans regia (g)"],
+  "PAURE": ["Acer campestre (g)", "Ficus carica (g)", "Tilia tomentosa (g)"],
+  "PERIARTRITE": ["Ampelopsis veitchii (gg)", "Betula verrucosa (l)", "Buxus sempervirens (gg)", "Viscum album (gg)"],
+  "PERICARDITE": ["Crataegus oxyacantha (g)"],
+  "PERIFLEBITE": ["Alnus glutinosa (g)"],
+  "PIASTRINOPENIA": ["Carpinus betulus (g)", "Quercus peduncolata (g,gr,sr)", "Tamarix gallica (gg)"],
+  "PIELONEFRITE": ["Calluna vulgaris (gg)", "Vaccinium vitis idaea (gg)"],
+  "POLIARTRITE": ["Ampelopsis veitchii (gg)", "Calluna vulgaris (gg)", "Ficus carica (g)", "Juniperus communis (gg)"],
+  "POLMONITE": ["Alnus glutinosa (g)", "Ribes nigrum (g)"],
+  "PORPORA": ["Carpinus betulus (g)", "Tamarix gallica (g)"],
+  "PROSTATITE": ["Betula pubescens (g)", "Calluna vulgaris (gg)", "Juniperus communis (gg)", "Quercus peduncolata (g)", "Ribes nigrum (g)", "Sequoia gigantea (gg)"],
+  "PRURITI": ["Cedrus libani (gg)", "Platanus orientalis (g)", "Ribes nigrum (g)", "Rosa canina (gg)", "Ulmus campestris (g)"],
+  "PSORIASI": ["Cedrus libani (gg)", "Juglans regia (g)", "Secale cereale (gr)", "Ulmus campestris (g)"],
+  "RACHITISMO": ["Abies pectinata (g)", "Pinus montana (g)"],
+  "RAYNAUD": ["Aesculus hippocastanum (g)", "Ginkgo biloba (g)", "Populus nigra (g)"],
+  "REFLUSSO": ["Ficus carica (g)", "Morus nigra (g)", "Tilia tomentosa (g)"],
+  "RETINOPATIA": ["Alnus glutinosa (g)", "Morus nigra (g)", "Vaccinium myrtillus (gg)"],
+  "REUMATISMO": ["Ampelopsis veitchii (gg)", "Betula verrucosa (l)", "Pinus montana (g)", "Ribes nigrum (g)", "Salix alba (ss)", "Vitis vinifera (g)"],
+  "RINITE ALLERGICA": ["Alnus glutinosa (g)", "Ribes nigrum (g)", "Rosa canina (gg)"],
+  "RINITE CRONICA": ["Alnus glutinosa (g)", "Carpinus betulus (g)", "Rosa canina (gg)"],
+  "RINOFARINGITE": ["Carpinus betulus (g)", "Rosa canina (gg)"],
+  "RITENZIONE IDRICA": ["Betula pubescens (g,sr)", "Betula verrucosa (l)", "Fraxinus excelsior (g)", "Prunus spinosa (g)"],
+  "SCIATICA": ["Pinus montana (g)", "Vaccinium vitis idaea (gg)"],
+  "SCLEROSI MULTIPLA": ["Betula verrucosa (s)", "Ginkgo biloba (g)"],
+  "SEBORREA": ["Betula pubescens (gr)", "Cedrus libani (gg)", "Ulmus campestris (g)"],
+  "SENESCENZA": ["Ginkgo biloba (g)", "Quercus peduncolata (a,g,gh)", "Rosmarinus officinalis (gg)", "Sequoia gigantea (gg)", "Vaccinium vitis idaea (gg)"],
+  "SINDROME PREMESTRUALE": ["Quercus peduncolata (a)", "Rubus idaeus (gg)", "Salix alba (a)"],
+  "SINOVITE": ["Pinus montana (g)", "Ribes nigrum (g)", "Rosa canina (gg)"],
+  "SINUSITE": ["Alnus glutinosa (g)", "Betula pubescens (g)", "Carpinus betulus (g)", "Ficus carica (g)", "Juglans regia (g)", "Ribes nigrum (g)"],
+  "SPASMI": ["Ficus carica (g)", "Tilia tomentosa (g)", "Viburnum lantana (g)"],
+  "SPLENOMEGALIA": ["Calluna vulgaris (gg)", "Juglans regia (g)", "Lonicera nigra (gg)", "Tamarix gallica (gg)"],
+  "STERILITA": ["Betula pubescens (a,g)", "Ficus carica (g)", "Rubus idaeus (gg)", "Salix alba (a)", "Viburnum lantana (g)"],
+  "STIPSI": ["Ficus carica (g)", "Prunus persica (s)", "Vaccinium vitis idaea (gg)"],
+  "STOMATITE AFTOSA": ["Juglans regia (g)", "Vaccinium myrtillus (gg)"],
+  "STRESS": ["Ficus carica (g)", "Ribes nigrum (g)", "Tilia tomentosa (g)"],
+  "TACHICARDIA": ["Crataegus oxyacantha (gg)", "Ficus carica (g)", "Olea europaea (gg)", "Tilia tomentosa (g)"],
+  "TENDINITI": ["Ampelopsis veitchii (gg)", "Betula pubescens (g)", "Fraxinus excelsior (g)", "Ribes nigrum (g)"],
+  "TONSILLITE": ["Abies pectinata (g)", "Ailanthus altissima (gf)", "Betula verrucosa (g)", "Juglans regia (g)", "Lonicera nigra (gg)", "Ribes nigrum (g)", "Rosa canina (gg)", "Vitis vinifera (g)"],
+  "TOSSE": ["Carpinus betulus (g)", "Castanea vesca (g)", "Lonicera nigra (gg)", "Morus nigra (sr)"],
+  "TRACHEITE": ["Carpinus betulus (g)", "Lonicera nigra (gg)"],
+  "TROMBOFLEBITE": ["Alnus glutinosa (g)", "Castanea vesca (g)", "Citrus limonum (ss)", "Sorbus domestica (g)"],
+  "TUBERCOLOSI": ["Juglans regia (g)", "Prunus spinosa (g)", "Rosa canina (gg)"],
+  "TUMORI": ["Alnus incana (g)", "Buxus sempervirens (gg)", "Vaccinium vitis idaea (gg)", "Viscum album (gg)", "Vitis vinifera (g,sr)"],
+  "ULCERA GASTRODUODENALE": ["Alnus glutinosa (g)", "Ficus carica (g)", "Vaccinium myrtillus (gg)"],
+  "ULCERA VARICOSA": ["Alnus glutinosa (g)", "Alnus incana (g)", "Castanea vesca (g)", "Juglans regia (g)", "Sorbus domestica (g)"],
+  "UNGHIE": ["Betula verrucosa (l)", "Castanea vesca (g)"],
+  "URETRITE": ["Calluna vulgaris (gg)", "Vaccinium vitis idaea (gg)"],
+  "VARICI": ["Aesculus hippocastanum (g)", "Castanea vesca (g)", "Sorbus domestica (g)"],
+  "VASCULOPATIE": ["Cercis siliquastrum (g)", "Cornus sanguinea (g)", "Ginkgo biloba (g)"],
+  "VERMINOSI": ["Ficus carica (g)", "Juglans regia (g)"],
+  "VERTIGINI": ["Alnus glutinosa (g)", "Ginkgo biloba (g)", "Ligustrum vulgare (gg)", "Sequoia gigantea (gg)", "Viscum album (gg)"],
+  "VITILIGINE": ["Platanus orientalis (g)"],
+  "VOMITO": ["Citrus limonum (g)", "Ficus carica (g)"],
+  "VULVITE": ["Quercus peduncolata (g)", "Rubus idaeus (gg)"]
+};
+
+// RIMANDI (sinonimi che puntano ad altre voci)
+var RIMANDI = {
+  "ACCRESCIMENTO": "CRESCITA RITARDO",
+  "ACIDO URICO": "IPERURICEMIA",
+  "AMNESIA": "MEMORIA DISTURBI",
+  "ANCHILOSTOMIASI": "VERMINOSI",
+  "FLEBITE": "TROMBOFLEBITE",
+  "IALINOSI": "FIBROIALINOSI",
+  "ILEITE TERMINALE": "CROHN",
+  "IPERTIROIDISMO": "BASEDOW",
+  "IPERTROFIA PROSTATICA": "ADENOMA PROSTATICO",
+  "LOMBALGIA": "LOMBAGINE",
+  "MAL D'AUTO": "CHINETOSI",
+  "MENOMETRORRAGIA": "METRORRAGIA",
+  "MESANGITE": "NEFRITE",
+  "PALPITAZIONI": "TACHICARDIA",
+  "PARASSITOSI INTESTINALE": "VERMINOSI",
+  "URICEMIA": "IPERURICEMIA",
+  "URINARIA INCONTINENZA": "INCONTINENZA URINARIA",
+  "URINARIA LITIASI": "LITIASI RENALE"
+};
+
+
+function renderGemmoList() {
+  var html = '';
+  for (var i = 0; i < DB.length; i++) {
+    var g = DB[i];
+    html += '<div class="item" onclick="showGemmoDetail(' + i + ')">';
+    html += '<div class="item-name">' + g.nome + '</div>';
+    html += '<div class="item-part">Parte: ' + g.parte + '</div>';
+    html += '</div>';
+  }
+  document.getElementById('gemmoList').innerHTML = html || '<div class="no-results">Nessun gemmoderivato trovato</div>';
+}
+
+function renderPatList() {
+  var keys = Object.keys(PATOLOGIE).sort();
+  var html = '';
+  for (var i = 0; i < keys.length; i++) {
+    var pat = keys[i];
+    var rimedi = PATOLOGIE[pat];
+    html += '<div class="item" onclick="showPatDetail(\'' + pat.replace(/'/g, "\\'") + '\')">';
+    html += '<div class="item-name">' + pat + '</div>';
+    html += '<div class="item-count">' + rimedi.length + ' rimedi</div>';
+    html += '</div>';
+  }
+  document.getElementById('patList').innerHTML = html || '<div class="no-results">Nessuna patologia trovata</div>';
+}
+
+function filterGemmo() {
+  var q = document.getElementById('searchGemmo').value.toLowerCase();
+  currentFilteredGemmo = [];
+  var html = '';
+  
+  for (var i = 0; i < DB.length; i++) {
+    var g = DB[i];
+    var match = g.nome.toLowerCase().indexOf(q) !== -1 ||
+                g.parte.toLowerCase().indexOf(q) !== -1;
+    
+    if (!match) {
+      for (var j = 0; j < g.indicazioni.length; j++) {
+        if (g.indicazioni[j].toLowerCase().indexOf(q) !== -1) {
+          match = true;
+          break;
+        }
+      }
+    }
+    
+    if (match) {
+      currentFilteredGemmo.push(g);
+      html += '<div class="item" onclick="showGemmoDetail(' + (currentFilteredGemmo.length - 1) + ')">';
+      html += '<div class="item-name">' + g.nome + '</div>';
+      html += '<div class="item-part">Parte: ' + g.parte + '</div>';
+      html += '</div>';
+    }
+  }
+  
+  document.getElementById('gemmoList').innerHTML = html || '<div class="no-results">Nessun risultato</div>';
+}
+
+function filterPat() {
+  var q = document.getElementById('searchPat').value.toLowerCase();
+  currentFilteredPat = [];
+  var html = '';
+  
+  // Unisco PATOLOGIE e RIMANDI
+  var allKeys = Object.keys(PATOLOGIE).concat(Object.keys(RIMANDI)).sort();
+  
+  for (var i = 0; i < allKeys.length; i++) {
+    var pat = allKeys[i];
+    if (pat.toLowerCase().indexOf(q) !== -1) {
+      currentFilteredPat.push(pat);
+      
+      // Controlla se è un rimando
+      if (RIMANDI[pat]) {
+        var targetPat = RIMANDI[pat];
+        var rimedi = PATOLOGIE[targetPat] || [];
+        html += '<div class="item" onclick="showPatDetail(\'' + pat.replace(/'/g, "\\'") + '\')">';
+        html += '<div class="item-name">' + pat + ' → ' + targetPat + '</div>';
+        html += '<div class="item-count">' + rimedi.length + ' rimedi</div>';
+        html += '</div>';
+      } else {
+        var rimedi = PATOLOGIE[pat];
+        html += '<div class="item" onclick="showPatDetail(\'' + pat.replace(/'/g, "\\'") + '\')">';
+        html += '<div class="item-name">' + pat + '</div>';
+        html += '<div class="item-count">' + rimedi.length + ' rimedi</div>';
+        html += '</div>';
+      }
+    }
+  }
+  
+  document.getElementById('patList').innerHTML = html || '<div class="no-results">Nessun risultato</div>';
+}
+
+function showGemmoDetail(idx) {
+  var source = currentFilteredGemmo.length > 0 ? currentFilteredGemmo : DB;
+  var g = source[idx];
+  
+  var html = '<div class="detail-header">';
+  html += '<div class="detail-title">' + g.nome + '</div>';
+  html += '<div class="detail-subtitle">(' + g.parte + ')</div>';
+  html += '</div>';
+  
+  html += '<div class="detail-section">';
+  html += '<div class="section-title">📋 Indicazioni cliniche</div>';
+  html += '<div class="section-content">';
+  for (var i = 0; i < g.indicazioni.length; i++) {
+    html += '<div class="indication-item">• ' + g.indicazioni[i] + '</div>';
+  }
+  html += '</div></div>';
+  
+  html += '<div class="detail-section">';
+  html += '<div class="section-title">💊 Posologia</div>';
+  html += '<div class="section-content">' + g.posologia + '</div>';
+  html += '</div>';
+  
+  if (g.controindicazioni && g.controindicazioni !== "Nessuna") {
+    html += '<div class="detail-section">';
+    html += '<div class="section-title">⚠️ Controindicazioni</div>';
+    html += '<div class="section-content">' + g.controindicazioni + '</div>';
+    html += '</div>';
+  }
+  
+  if (g.sinergie && g.sinergie.length > 0) {
+    html += '<div class="detail-section">';
+    html += '<div class="section-title">🤝 Sinergie principali</div>';
+    html += '<div class="section-content">';
+    for (var i = 0; i < g.sinergie.length; i++) {
+      html += '<span style="display:inline-block; margin:3px 8px 3px 0; padding:4px 10px; background:#e3f2fd; border-radius:12px; font-size:13px;">' + g.sinergie[i] + '</span>';
+    }
+    html += '</div></div>';
+  }
+  
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('modal').style.display = 'block';
+}
+
+function showPatDetail(patName) {
+  // Controlla se è un rimando
+  var actualPatName = patName;
+  var isRimando = false;
+  
+  if (RIMANDI[patName]) {
+    actualPatName = RIMANDI[patName];
+    isRimando = true;
+  }
+  
+  var rimedi = PATOLOGIE[actualPatName];
+  
+  var html = '<div class="detail-header">';
+  if (isRimando) {
+    html += '<div class="detail-title">' + patName + '</div>';
+    html += '<div class="detail-subtitle">→ Vedi: ' + actualPatName + '</div>';
+    html += '<div class="detail-subtitle">' + rimedi.length + ' gemmoderivati indicati</div>';
+  } else {
+    html += '<div class="detail-title">' + patName + '</div>';
+    html += '<div class="detail-subtitle">' + rimedi.length + ' gemmoderivati indicati</div>';
+  }
+  html += '</div>';
+  
+  html += '<div class="detail-section">';
+  html += '<div class="section-title">🌿 Rimedi consigliati</div>';
+  html += '<div class="section-content">';
+  for (var i = 0; i < rimedi.length; i++) {
+    html += '<div class="gemmo-item">' + (i + 1) + '. ' + rimedi[i] + '</div>';
+  }
+  html += '</div></div>';
+  
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('modal').style.display = 'block';
+}
+
+
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+}
+
+function closeModalClick(e) {
+  if (e.target.id === 'modal') {
+    closeModal();
+  }
+}
+
+function switchTab(tab) {
+  var tabs = document.querySelectorAll('.tab');
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].classList.remove('active');
+  }
+  
+  if (tab === 'gemmo') {
+    tabs[0].classList.add('active');
+    document.getElementById('gemmoTab').classList.remove('hidden');
+    document.getElementById('patologieTab').classList.add('hidden');
+  } else {
+    tabs[1].classList.add('active');
+    document.getElementById('gemmoTab').classList.add('hidden');
+    document.getElementById('patologieTab').classList.remove('hidden');
+  }
+  
+  currentTab = tab;
+}
+
+renderGemmoList();
+renderPatList();
+</script>
+
+</body>
+</html>
