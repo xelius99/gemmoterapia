@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>ErboStrategy AI</title>
+    
+    <!-- PWA Configuration -->
+    <meta name="theme-color" content="#065f46" />
+    <meta name="description" content="Assistente AI per erboristi esperti" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23ecfdf5%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22central%22 text-anchor=%22middle%22 font-size=%2270%22>🌿</text></svg>">
+
+    <!-- Polyfill for process (Non-destructive to preserve injected env vars) -->
+    <script>
+      window.process = window.process || {};
+      window.process.env = window.process.env || {};
+      // Do not overwrite API_KEY if it exists
+    </script>
+
+    <!-- Error Handling -->
+    <script>
+      window.onerror = function(msg, url, line, col, error) {
+        console.error("Global Error:", msg, url, line, col, error);
+        return false;
+      };
+    </script>
+
+    <!-- Global UMD Libraries -->
+    <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/marked@4.3.0/marked.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Load Google GenAI SDK (Multi-CDN Strategy with Strict Timeout) -->
+    <script type="module">
+      const CDNs = [
+        "https://esm.run/@google/genai",                 // Primary: Google optimized jsDelivr
+        "https://cdn.jsdelivr.net/npm/@google/genai/+esm", // Backup: Direct jsDelivr ESM
+        "https://esm.sh/@google/genai",                  // Backup: esm.sh
+        "https://unpkg.com/@google/genai/+esm"           // Last Resort: unpkg ESM
+      ];
+
+      // Helper to race import against a timeout
+      function importWithTimeout(url, timeoutMs) {
+        return new Promise((resolve, reject) => {
+          const timer = setTimeout(() => reject(new Error(`Timeout loading ${url}`)), timeoutMs);
+          import(url).then(
+            (mod) => { clearTimeout(timer); resolve(mod); },
+            (err) => { clearTimeout(timer); reject(err); }
+          );
+        });
+      }
+
+      async function loadSdk() {
+        for (const url of CDNs) {
+          try {
+            console.log("Attempting to load SDK from:", url);
+            // Strict 3.5s timeout per CDN to prevent hanging
+            const mod = await importWithTimeout(url, 3500);
+            
+            // Handle various export shapes (Named vs Default)
+            let sdk = null;
+            if (mod.GoogleGenAI) {
+              sdk = mod.GoogleGenAI;
+            } else if (mod.default && mod.default.GoogleGenAI) {
+              sdk = mod.default.GoogleGenAI;
+            } else if (mod.default && typeof mod.default === 'function' && mod.default.name === 'GoogleGenAI') {
+               sdk = mod.default;
+            }
+
+            if (sdk) {
+              window.GoogleGenAI = sdk;
+              console.log("SDK Loaded successfully from:", url);
+              return; // Success
+            } else {
+               console.warn("SDK loaded but class not found in exports:", url, mod);
+            }
+          } catch (e) {
+            console.warn("Failed or timed out loading SDK from:", url, e);
+          }
+        }
+        // If we reach here, all CDNs failed
+        console.error("All SDK sources failed.");
+        window.GoogleGenAI_Error = true;
+      }
+      
+      loadSdk();
+    </script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+      body { font-family: 'Lato', sans-serif; background-color: #fcfdfa; }
+      h1, h2, h3, h4 { font-family: 'Playfair Display', serif; }
+      
+      /* Markdown Styles - Professional & Subtle */
+      .markdown-prose h1 { font-size: 1.4em; font-weight: 700; color: #374151; margin-top: 1em; border-bottom: 2px solid #a7f3d0; padding-bottom: 0.2em; }
+      .markdown-prose h2 { font-size: 1.2em; font-weight: 600; color: #065f46; margin-top: 1em; background-color: #ecfdf5; padding: 4px 8px; border-radius: 4px; display: inline-block; }
+      .markdown-prose h3 { font-size: 1.1em; font-weight: 600; color: #047857; margin-top: 0.8em; }
+      .markdown-prose ul { list-style-type: none; padding-left: 0; margin-bottom: 1em; }
+      .markdown-prose li { position: relative; padding-left: 1.5em; margin-bottom: 0.5em; color: #374151; }
+      .markdown-prose li::before { content: "•"; color: #10b981; font-weight: bold; position: absolute; left: 0; }
+      .markdown-prose strong { color: #064e3b; font-weight: 700; }
+      .markdown-prose em { color: #059669; }
+      .markdown-prose p { margin-bottom: 0.8em; }
+      
+      .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel" data-presets="react,env">
+      const { useState, useRef, useEffect } = React;
+      const { createRoot } = ReactDOM;
+
+      // --- Updated Prompt for Expert Chemist ---
+      const DEFAULT_SYSTEM_PROMPT = `Sei un erborista e fitoterapeuta esperto con un negozio specializzato.
+Il tuo utente è un CHIMICO ESPERTO ED ERBORISTA.
+- NON fornire spiegazioni di base o divulgative.
+- Sii estremamente tecnico, sintetico e diretto.
+- Focalizzati sui principi attivi, titolazioni e sinergie biochimiche.
+
+FORMATO OBBLIGATORIO:
+- Usa ESCLUSIVAMENTE elenchi puntati.
+- Usa colori tenui/pastello sfruttando la formattazione (es. titoli chiari, grassetti strategici).
+- Niente muri di testo. Solo informazioni azionabili.
+
+STRUTTURA RISPOSTA:
+1. Analisi Sintetica (Costituzione/Terreno)
+2. Protocollo Consigliato (Nome latino, parte drogata, tipo di estratto es. TM, ES titolato)
+3. Biochimica e Meccanismo d'Azione (Sintetico)
+4. Alert Interazioni (Rigido controllo incrociato con farmaci)`;
+
+      // --- Components ---
+
+      function SettingsModal({ onClose, savedSystemPrompt, onSaveSystemPrompt, defaultSystemPrompt }) {
+        const [prompt, setPrompt] = useState(savedSystemPrompt || defaultSystemPrompt);
+
+        const handleSave = () => {
+          onSaveSystemPrompt(prompt.trim());
+          onClose();
+        };
+
+        return (
+          <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 animate-fade-in">
+            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full flex flex-col max-h-[90vh]">
+              <div className="p-5 border-b border-stone-100 flex justify-between items-center">
+                 <h3 className="text-lg font-bold text-emerald-800">Personalizzazione AI</h3>
+                 <button onClick={onClose} className="text-stone-400 hover:text-stone-600">✕</button>
+              </div>
+              <div className="p-6 overflow-y-auto flex-grow">
+                  <div>
+                    <label className="block text-sm font-bold text-stone-700 mb-2">Prompt di Sistema (Persona)</label>
+                    <textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} className="w-full border border-stone-300 rounded p-2 h-64 text-xs font-mono focus:ring-2 focus:ring-emerald-500 outline-none" />
+                    <button onClick={() => setPrompt(defaultSystemPrompt)} className="text-xs text-red-500 underline mt-2">Ripristina Default</button>
+                  </div>
+              </div>
+              <div className="p-5 border-t border-stone-100 bg-stone-50 rounded-b-xl">
+                 <button onClick={handleSave} className="w-full bg-emerald-700 text-white py-2 rounded-lg font-bold hover:bg-emerald-800 transition-colors">Salva Configurazione</button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function Header({ onNewConsultation, onOpenSettings }) {
+        return (
+          <header className="bg-emerald-800 text-white p-4 shadow-md sticky top-0 z-40">
+            <div className="max-w-6xl mx-auto flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <span className="text-3xl">🌿</span>
+                <div>
+                  <h1 className="text-lg md:text-xl font-bold tracking-wide">ErboStrategy AI</h1>
+                  <p className="text-emerald-200 text-xs uppercase tracking-wider">Pro Edition</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                 <button onClick={onOpenSettings} className="p-2 rounded-full text-emerald-100 hover:bg-emerald-700 transition-colors" title="Impostazioni AI">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                 </button>
+                 <button onClick={onNewConsultation} className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded text-sm font-bold border border-emerald-400 transition-colors shadow-sm">
+                    Nuovo
+                 </button>
+              </div>
+            </div>
+          </header>
+        );
+      }
+
+      function App() {
+        const [loading, setLoading] = useState(false);
+        const [result, setResult] = useState(null);
+        const [sdkReady, setSdkReady] = useState(false);
+        const [loadError, setLoadError] = useState(false);
+        const [forceRetry, setForceRetry] = useState(0); // Forcing re-render for checks
+        
+        const [systemPrompt, setSystemPrompt] = useState(() => localStorage.getItem("erbo_system_prompt") || DEFAULT_SYSTEM_PROMPT);
+        const [showSettings, setShowSettings] = useState(false);
+
+        // Form Inputs
+        const [age, setAge] = useState("");
+        const [sex, setSex] = useState("F");
+        const [pathologies, setPathologies] = useState("");
+        const [medications, setMedications] = useState("");
+        
+        // Library
+        const [library, setLibrary] = useState(() => {
+            try { return JSON.parse(localStorage.getItem("erboLibrary")) || []; } catch { return []; }
+        });
+        const [manualEntry, setManualEntry] = useState("");
+        
+        // --- SDK Loading Check (Robust) ---
+        useEffect(() => {
+            let mounted = true;
+            
+            const checkStatus = () => {
+                if (!mounted) return;
+                
+                if (window.GoogleGenAI) {
+                    setSdkReady(true);
+                    setLoadError(false);
+                } else if (window.GoogleGenAI_Error) {
+                    setLoadError(true);
+                }
+            };
+
+            // Check repeatedly
+            const checkInterval = setInterval(checkStatus, 500);
+            
+            // Initial check
+            checkStatus();
+
+            return () => { mounted = false; clearInterval(checkInterval); }
+        }, [forceRetry]);
+
+        useEffect(() => { localStorage.setItem("erboLibrary", JSON.stringify(library)); }, [library]);
+
+        const addToLibrary = (name, content) => {
+          setLibrary(prev => [...prev, { id: Date.now().toString(), name: name || "Nota", content, date: new Date().toLocaleDateString() }]);
+        };
+
+        const handleAnalyze = async () => {
+          if (!pathologies) { alert("Inserire almeno le patologie."); return; }
+
+          setLoading(true);
+          setResult(""); // Clear previous
+
+          try {
+            if (!window.GoogleGenAI) {
+              throw new Error("Libreria AI non caricata correttamente. Riprova tra poco.");
+            }
+            
+            // --- API KEY HANDLING WITH FALLBACK ---
+            let apiKey = process.env.API_KEY;
+
+            // If API Key is missing and we are in an AI Studio/Preview environment,
+            // try to trigger the native key selector.
+            if (!apiKey && window.aistudio && typeof window.aistudio.openSelectKey === 'function') {
+                try {
+                    // Force the selection dialog
+                    await window.aistudio.openSelectKey();
+                    // In most environments, this updates the process.env immediately
+                    apiKey = process.env.API_KEY;
+                } catch (kErr) {
+                    console.warn("API Key selection cancelled or failed", kErr);
+                }
+            }
+
+            if (!apiKey) {
+               throw new Error("Chiave API mancante. Seleziona una chiave valida per procedere.");
+            }
+            // --------------------------------------
+
+            const ai = new window.GoogleGenAI({ apiKey });
+            
+            const contextString = library.length > 0 ? library.map(s => `FONTE [${s.name}]: ${s.content}`).join("\n\n") : "Nessuna fonte aggiuntiva.";
+            
+            const prompt = `CLIENTE: Età ${age}, Sesso ${sex}.\nDISTURBI: ${pathologies}\nFARMACI: ${medications}\n\n${contextString}`;
+
+            const response = await ai.models.generateContentStream({
+              model: "gemini-3-pro-preview",
+              contents: [{ role: "user", parts: [{ text: prompt }] }],
+              config: { systemInstruction: systemPrompt }
+            });
+
+            let fullText = "";
+            for await (const chunk of response) {
+              fullText += chunk.text;
+              setResult(fullText);
+            }
+          } catch (error) {
+            console.error(error);
+            let msg = error.message || String(error);
+            // Translate common SDK errors to friendly messages
+            if (msg.includes("403") || msg.includes("API key")) msg = "Chiave API non valida o permessi insufficienti.";
+            else if (msg.includes("Failed to fetch")) msg = "Errore di connessione. Controlla la tua rete.";
+            
+            alert("Errore Generazione: " + msg);
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        const handleRetryLoad = () => {
+             window.location.reload();
+        };
+
+        const resetForm = () => {
+            setAge(""); setPathologies(""); setMedications(""); setResult(null);
+        };
+
+        return (
+          <div className="min-h-screen flex flex-col text-stone-800">
+            <Header onNewConsultation={resetForm} onOpenSettings={() => setShowSettings(true)} />
+            {showSettings && <SettingsModal onClose={() => setShowSettings(false)} savedSystemPrompt={systemPrompt} onSaveSystemPrompt={(p) => {setSystemPrompt(p); localStorage.setItem("erbo_system_prompt", p)}} defaultSystemPrompt={DEFAULT_SYSTEM_PROMPT} />}
+
+            <main className="flex-grow p-4 md:p-6 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+              
+              {/* INPUT COLUMN */}
+              <div className="lg:col-span-5 space-y-4">
+                <div className="bg-white p-5 rounded-lg shadow-sm border border-stone-200">
+                   <h2 className="text-emerald-800 font-bold mb-3 border-b border-emerald-100 pb-2">Dati Paziente</h2>
+                   <div className="grid grid-cols-2 gap-3 mb-3">
+                     <input type="number" placeholder="Età" value={age} onChange={e => setAge(e.target.value)} className="border p-2 rounded w-full focus:ring-2 focus:ring-emerald-500 outline-none" />
+                     <select value={sex} onChange={e => setSex(e.target.value)} className="border p-2 rounded w-full focus:ring-2 focus:ring-emerald-500 outline-none">
+                       <option value="F">Femmina</option>
+                       <option value="M">Maschio</option>
+                     </select>
+                   </div>
+                   <textarea placeholder="Patologie e Sintomi (sii preciso)" value={pathologies} onChange={e => setPathologies(e.target.value)} className="w-full border p-2 rounded h-24 mb-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+                   <textarea placeholder="Farmaci in uso" value={medications} onChange={e => setMedications(e.target.value)} className="w-full border p-2 rounded h-16 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+                </div>
+
+                <div className="bg-white p-5 rounded-lg shadow-sm border border-stone-200">
+                   <h2 className="text-emerald-800 font-bold mb-3 border-b border-emerald-100 pb-2 flex justify-between">
+                     <span>Knowledge Base</span>
+                     <span className="text-xs font-normal text-stone-500 self-center">{library.length} fonti</span>
+                   </h2>
+                   <div className="flex gap-2 mb-3">
+                     <input type="text" placeholder="Incolla testo tecnico..." value={manualEntry} onChange={e => setManualEntry(e.target.value)} className="flex-grow border p-2 rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none" />
+                     <button onClick={() => {if(manualEntry){addToLibrary("Appunti", manualEntry); setManualEntry("")}}} className="bg-stone-600 text-white px-3 rounded text-sm hover:bg-stone-700 font-bold transition-colors">+</button>
+                   </div>
+                   <div className="max-h-32 overflow-y-auto space-y-1">
+                     {library.map(l => (
+                       <div key={l.id} className="flex justify-between items-center bg-stone-50 p-2 rounded text-xs border-l-4 border-emerald-500">
+                         <span className="truncate w-3/4 font-semibold text-stone-700">{l.name}</span>
+                         <button onClick={() => setLibrary(prev => prev.filter(i => i.id !== l.id))} className="text-stone-400 hover:text-red-600 p-1">✕</button>
+                       </div>
+                     ))}
+                   </div>
+                </div>
+
+                <button 
+                  onClick={loadError ? handleRetryLoad : handleAnalyze} 
+                  disabled={loading || (!sdkReady && !loadError)}
+                  className={`w-full py-3 rounded-lg font-bold text-white shadow-md transition-all active:scale-95 flex justify-center items-center gap-2 ${loading || (!sdkReady && !loadError) ? "bg-stone-400 cursor-not-allowed" : (loadError ? "bg-red-600 hover:bg-red-700" : "bg-emerald-700 hover:bg-emerald-800")}`}
+                >
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                      Elaborazione...
+                    </>
+                  ) : loadError ? (
+                    "Errore Rete (Clicca per Ricaricare)"
+                  ) : !sdkReady ? (
+                    "Caricamento risorse..."
+                  ) : (
+                    "Genera Protocollo"
+                  )}
+                </button>
+              </div>
+
+              {/* OUTPUT COLUMN */}
+              <div className="lg:col-span-7 bg-white p-6 rounded-lg shadow-sm border border-stone-200 min-h-[60vh] flex flex-col">
+                <h2 className="text-emerald-800 font-bold mb-4 flex items-center gap-2 border-b border-stone-100 pb-2">
+                  <span className="text-xl">📋</span> Strategia Terapeutica
+                </h2>
+                <div className="flex-grow markdown-prose leading-relaxed text-sm md:text-base">
+                  {result ? (
+                    <div dangerouslySetInnerHTML={{ __html: marked.parse(result) }}></div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-full text-stone-300">
+                       <div className="text-6xl mb-4 opacity-20">⚕️</div>
+                       <p className="font-semibold">In attesa dei dati clinici</p>
+                       <p className="text-xs text-stone-400 mt-2 text-center max-w-xs">Inserisci anamnesi e farmaci a sinistra per generare un protocollo fitoterapico sicuro.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+            </main>
+          </div>
+        );
+      }
+
+      const root = createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
